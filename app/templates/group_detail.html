@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}{{ group.name }}{% endblock %}
+
+{% block content %}
+<div class="general-card">
+    <div class="header">
+        <div>
+            <h1>{{ group.name }}</h1>
+            <p>{{ group.description }}</p>
+            <p><strong>Join Code:</strong> <code>{{ group.join_code }}</code></p>
+        </div>
+        <div class="group-actions">
+            <a href="{{ url_for('my_list', group_id=group.id) }}" class="btn-primary">Manage My List</a>
+            <a href="{{ url_for('dashboard') }}" class="btn-secondary">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <h2>Member Gift Lists</h2>
+    
+    {% if member_gifts|length == 0 %}
+        <p>No other members in this group yet.</p>
+    {% else %}
+        {% for member in member_gifts %}
+            <div class="member-section">
+                <h3>{{ member.user.username }}
+                    {% if member.claimed_by_me > 0 %}
+                        <span class="badge-success">{{ member.claimed_by_me }} claimed by you</span>
+                    {% endif %}
+                </h3>
+                
+                {% if member.gifts|length == 0 %}
+                    <p class="text-muted">No gifts added yet</p>
+                {% else %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Description</th>
+                                <th>Link</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for gift in member.gifts %}
+                                <tr>
+                                    <td>{{ gift.item_name }}</td>
+                                    <td>{{ gift.description or "No description" }}</td>
+                                    <td>
+                                        {% if gift.link %}
+                                            <a href="{{ gift.link }}" target="_blank">View</a>
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if gift.claimer_id == current_user.id %}
+                                            <span class="badge-success">Claimed by you</span>
+                                        {% elif gift.is_claimed %}
+                                            <span class="badge-claimed">Claimed</span>
+                                        {% else %}
+                                            <span class="badge-available">Available</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if gift.claimer_id == current_user.id %}
+                                            <form method="POST" action="{{ url_for('unclaim_item', item_id=gift.id) }}" style="display:inline;">
+                                                <button type="submit" class="btn-small btn-unclaim">Unclaim</button>
+                                            </form>
+                                        {% elif not gift.is_claimed %}
+                                            <form method="POST" action="{{ url_for('claim_item', item_id=gift.id) }}" style="display:inline;">
+                                                <button type="submit" class="btn-small btn-claim">Claim</button>
+                                            </form>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

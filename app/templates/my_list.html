@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}My Gifts{% endblock %}
+
+{% block content %}
+<div class="general-card">
+    <div class="header">
+        <h1>My List</h1>
+        <div class="header-actions">
+            <a href="{{ url_for('create_group') }}" class="btn-primary">Back to Group</a>
+            <a href="{{ url_for('join_group') }}" class="btn-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+    {% if gifts|length > 0 %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Description</th>
+                    <th>Link</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for gift in gifts %}
+                    <tr>
+                        <td>{{ gift.item_name }}</td>
+                        <td>{{ gift.description or "No description provided" }}</td>
+                        <td>
+                            {% if gift.link %}
+                                <a href="{{ gift.link }}" target="_blank">View Item</a>
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="POST" action="{{ url_for('delete_item', item_id=gift.id) }}" style="display: inline;">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You haven't added any gifts yet!</p>
+    {% endif %}
+
+    <div class="add-gift-section">
+        <button onclick="toggleGiftForm()" class="btn-add-gift" id="toggleButton">
+            Add Gift
+        </button>
+        
+        <div class="add-gift-form" id="giftForm" style="display: none;">
+            <h3>Add a New Gift</h3>
+            <form method="POST" action="{{ url_for('my_list', group_id=group.id) }}">
+                <div class="form-group">
+                    <label for="item_name">Item Name *</label>
+                    <input type="text" id="item_name" name="item_name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" rows="3" placeholder="e.g. size, color, etc."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="link">Link (URL)</label>
+                    <input type="url" id="link" name="link" placeholder="https://example.com/product">
+                </div>
+                
+                <button type="submit" class="btn-primary">Add Gift</button>
+                <button type="button" onclick="toggleGiftForm()" class="btn-secondary">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    function toggleGiftForm() {
+        const form = document.getElementById('giftForm');
+        const button = document.getElementById('toggleButton');
+        
+        if (form.style.display === 'none') {
+            form.style.display = 'block';
+            button.style.display = 'none';
+        } else {
+            form.style.display = 'none';
+            button.style.display = 'block';
+        }
+    }
+    </script>
+
+    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Join Group{% endblock %}
+
+{% block content %}
+<div class="general-card">
+    <h1>Join a Group</h1>
+    <p>Enter the join code you received to join an existing group.</p>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="join_code">Join Code *</label>
+            <input type="text" id="join_code" name="join_code" required 
+                   placeholder="Enter 6-character code" maxlength="6" 
+                   style="text-transform: uppercase;">
+        </div>
+        
+        <button type="submit" class="btn-primary">Join Group</button>
+        <a href="{{ url_for('dashboard') }}" class="btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
