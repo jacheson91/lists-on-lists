@@ -7,20 +7,26 @@ from app.models import User, GiftList, Group, group_members
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+@app.route('/')
+def index():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    else:
+        return redirect(url_for('login'))
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
     if request.method == 'POST':
-        username = request.form['username']
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
         email = request.form['email']
         password = request.form['password']
         if User.query.filter_by(email=email).first():
             flash('Email is already registered', 'danger')
-        elif User.query.filter_by(username=username).first():
-            flash('Username is already taken', 'danger')
         else:
-            user = User(username=username, email=email)
+            user = User(first_name=first_name, last_name=last_name, email=email)
             user.set_password(password)
             db.session.add(user)
             db.session.commit()

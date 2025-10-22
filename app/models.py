@@ -6,7 +6,8 @@ import secrets
 # User model
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), unique=True, nullable=False)
+    first_name = db.Column(db.String(150), nullable=False)
+    last_name = db.Column(db.String(150), nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
 
@@ -15,8 +16,12 @@ class User(db.Model, UserMixin):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
 
-# New Group model
+# Group model
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
@@ -42,7 +47,7 @@ group_members = db.Table('group_members',
 class GiftList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)  # NEW: Link to group
+    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)
     item_name = db.Column(db.String(200), nullable=False)
     description = db.Column(db.String(500), nullable=True)
     link = db.Column(db.String(500), nullable=True)
