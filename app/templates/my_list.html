@@ -7,8 +7,8 @@
     <div class="header">
         <h1>My List</h1>
         <div class="header-actions">
-            <a href="{{ url_for('create_group') }}" class="btn-primary">Back to Group</a>
-            <a href="{{ url_for('join_group') }}" class="btn-secondary">Back to Dashboard</a>
+            <a href="{{ url_for('group_detail', group_id=group.id) }}" class="btn-primary">Back to Group</a>
+            <a href="{{ url_for('dashboard') }}" class="btn-secondary">Back to Dashboard</a>
         </div>
     </div>
     {% if gifts|length > 0 %}
@@ -35,7 +35,7 @@
                         </td>
                         <td>
                             <form method="POST" action="{{ url_for('delete_item', item_id=gift.id) }}" style="display: inline;">
-                                <button type="submit">Delete</button>
+                                <button type="submit" class="btn-delete-gift">Delete</button>
                             </form>
                         </td>
                     </tr>

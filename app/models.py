@@ -2,6 +2,7 @@ from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 import secrets
+import random
 
 # User model
 class User(db.Model, UserMixin):
@@ -29,6 +30,7 @@ class Group(db.Model):
     join_code = db.Column(db.String(8), unique=True, nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    has_gift_exchange = db.Column(db.Boolean, default=False, nullable=False)
 
     def generate_join_code(self):
         """Generate a unique 6-character join code"""
@@ -43,6 +45,17 @@ group_members = db.Table('group_members',
     db.Column('group_id', db.Integer, db.ForeignKey('group.id'), primary_key=True),
     db.Column('joined_at', db.DateTime, default=db.func.current_timestamp())
 )
+
+# Gift Exchange assignments
+class GiftExchange(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)
+    giver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+    def __repr__(self):
+        return f'<GiftExchange: {self.giver_id} -> {self.receiver_id}>'
 
 class GiftList(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -109,7 +109,6 @@ a:hover {
   background-size: 300px 300px;
   background-position: center;
   background-repeat: repeat;
-  font-family: 'Nunito', sans-serif;
   padding: 20px;
 }
 
@@ -408,6 +407,7 @@ a:hover {
   font-size: 14px;
   transition: border-color 0.3s;
   box-sizing: border-box;
+  font-family: Nunito, sans-serif;
 }
 
 .form-group input:focus {
@@ -425,17 +425,25 @@ a:hover {
     color: white;
     border: none;
     border-radius: 6px;
-    font-size: 16px;
-    font-weight: 600;
+    font: inherit;
     cursor: pointer;
     transition: background 0.3s, transform 0.2s;
-    width: 100%;
-    max-width: 300px;
 }
 
 .btn-add-gift:hover {
     background: #4da573;
     transform: translateY(-2px);
+}
+
+.btn-delete-gift {
+    padding: 8px 16px;
+    background: #007b5e;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font: inherit;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
 }
 
 .add-gift-form {
@@ -475,16 +483,16 @@ a:hover {
   color: white;
   border: none;
   border-radius: 6px;
-  font-size: 16px;
-  font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
   display: inline-block;
   text-align: center;
+  font: inherit;
 }
 
 .btn-primary:hover {
+  color: white;
   transform: translateY(-2px);
   box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
 }
@@ -506,6 +514,7 @@ a:hover {
 }
 
 .btn-secondary:hover {
+  color: white;
   transform: translateY(-2px);
   box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
 }
@@ -549,13 +558,15 @@ button {
     background-color: #007b5e;
     color: white;
     border: none;
-    padding: 10px 15px;
+    padding: 12px 20px;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 6px;
+    line-height: 1.6;
 }
 
 button:hover {
-    background-color: #005a3c;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
 }
 
 button:disabled {
@@ -675,6 +686,66 @@ table th {
     opacity: 1;
 }
 
+/* Gift Exchange Styles */
+.gift-exchange-banner {
+    background: #16cbc9;
+    color: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.gift-exchange-banner h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 28px;
+}
+
+.exchange-assignment {
+    font-size: 20px;
+    margin: 15px 0;
+}
+
+.exchange-assignment strong {
+    font-size: 24px;
+    text-decoration: underline;
+}
+
+.exchange-hint {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-top: 10px;
+}
+
+.gift-exchange-setup {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    border: 2px dashed #60b886;
+}
+
+.gift-exchange-setup h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.gift-exchange-setup p {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.badge-exchange {
+    background: #ffd136;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-left: 10px;
+}
+
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
     .toolbar {
@@ -762,6 +833,10 @@ table th {
     .btn-view, .btn-list {
         width: 100%;
     }
+
+    .btn-add-gift {
+        width: 100%;
+    }
     
     .group-header {
         flex-direction: column;
@@ -806,9 +881,7 @@ table th {
     table {
         min-width: 600px;
     }
-}
 
-@media (max-width: 480px) {
     .toolbar-brand {
         font-size: 20px;  /* Even smaller for very small screens */
     }
@@ -817,7 +890,6 @@ table th {
         padding: 8px 12px;
         font-size: 14px;
     }
-}
     
     .general-card h1 {
         font-size: 18px;
@@ -837,5 +909,19 @@ table th {
     
     table th, table td {
         padding: 6px;
+    }
+}
+
+@media (max-width: 768px) {
+    .gift-exchange-banner h2 {
+        font-size: 22px;
+    }
+    
+    .exchange-assignment {
+        font-size: 18px;
+    }
+    
+    .exchange-assignment strong {
+        font-size: 20px;
     }
 }

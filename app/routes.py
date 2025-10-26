@@ -1,7 +1,8 @@
 from flask import render_template, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from app import app, db, login_manager
-from app.models import User, GiftList, Group, group_members
+from app.models import User, GiftList, Group, group_members, GiftExchange
+import random
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -160,11 +161,26 @@ def group_detail(group_id):
         flash('You are not a member of this group', 'danger')
         return redirect(url_for('dashboard'))
     
-    # Get all members and their gifts
+    # Check if user is the creator
+    is_creator = (group.created_by == current_user.id)
+    
+    # Get all members
     members = db.session.query(User).join(group_members).filter(
         group_members.c.group_id == group_id
     ).all()
     
+    # Check if gift exchange is active and get assignment
+    gift_exchange_assignment = None
+    if group.has_gift_exchange:
+        assignment = GiftExchange.query.filter_by(
+            group_id=group_id,
+            giver_id=current_user.id
+        ).first()
+        if assignment:
+            receiver = User.query.get(assignment.receiver_id)
+            gift_exchange_assignment = receiver
+    
+    # Get all members and their gifts (excluding current user)
     member_gifts = []
     for member in members:
         if member.id != current_user.id:
@@ -176,7 +192,69 @@ def group_detail(group_id):
                 'claimed_by_me': claimed_count
             })
     
-    return render_template('group_detail.html', group=group, member_gifts=member_gifts)
+    return render_template('group_detail.html', 
+                         group=group, 
+                         member_gifts=member_gifts,
+                         is_creator=is_creator,
+                         member_count=len(members),
+                         gift_exchange_assignment=gift_exchange_assignment)
+
+@app.route('/group/<int:group_id>/start-gift-exchange', methods=['POST'])
+@login_required
+def start_gift_exchange(group_id):
+    group = Group.query.get_or_404(group_id)
+    
+    # Check if user is the creator
+    if group.created_by != current_user.id:
+        flash('Only the group creator can start a gift exchange', 'danger')
+        return redirect(url_for('group_detail', group_id=group_id))
+    
+    # Check if gift exchange already exists
+    if group.has_gift_exchange:
+        flash('Gift exchange has already been started for this group', 'info')
+        return redirect(url_for('group_detail', group_id=group_id))
+    
+    # Get all members
+    members = db.session.query(User).join(group_members).filter(
+        group_members.c.group_id == group_id
+    ).all()
+    
+    # Need at least 2 people for gift exchange
+    if len(members) < 2:
+        flash('You need at least 2 members to start a gift exchange', 'danger')
+        return redirect(url_for('group_detail', group_id=group_id))
+    
+    # Create random assignments (ensure no one gets themselves)
+    givers = [m.id for m in members]
+    receivers = givers.copy()
+    
+    # Shuffle until no one has themselves
+    valid = False
+    attempts = 0
+    while not valid and attempts < 100:
+        random.shuffle(receivers)
+        valid = all(givers[i] != receivers[i] for i in range(len(givers)))
+        attempts += 1
+    
+    if not valid:
+        flash('Unable to create gift exchange assignments. Please try again.', 'danger')
+        return redirect(url_for('group_detail', group_id=group_id))
+    
+    # Save assignments to database
+    for i in range(len(givers)):
+        exchange = GiftExchange(
+            group_id=group_id,
+            giver_id=givers[i],
+            receiver_id=receivers[i]
+        )
+        db.session.add(exchange)
+    
+    # Mark group as having gift exchange
+    group.has_gift_exchange = True
+    db.session.commit()
+    
+    flash('Gift exchange started! Check who you got below.', 'success')
+    return redirect(url_for('group_detail', group_id=group_id))
 
 @app.route('/my-list/<int:group_id>', methods=['GET', 'POST'])
 @login_required
@@ -206,7 +284,6 @@ def my_list(group_id):
         )
         db.session.add(gift)
         db.session.commit()
-        flash('Gift item added successfully!', 'success')
         return redirect(url_for('my_list', group_id=group_id))
 
     gifts = GiftList.query.filter_by(user_id=current_user.id, group_id=group_id).all()

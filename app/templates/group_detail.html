@@ -9,12 +9,31 @@
             <h1>{{ group.name }}</h1>
             <p>{{ group.description }}</p>
             <p><strong>Join Code:</strong> <code>{{ group.join_code }}</code></p>
+            <p><strong>Members:</strong> {{ member_count }}</p>
         </div>
         <div class="group-actions">
             <a href="{{ url_for('my_list', group_id=group.id) }}" class="btn-primary">Manage My List</a>
-            <a href="{{ url_for('dashboard') }}" class="btn-secondary">← Back to Dashboard</a>
+            <a href="{{ url_for('dashboard') }}" class="btn-secondary">Back to Dashboard</a>
         </div>
     </div>
+
+    <!-- Gift Exchange Section -->
+    {% if group.has_gift_exchange %}
+        <div class="gift-exchange-banner">
+            <h2>🎁 Gift Exchange Active!</h2>
+            {% if gift_exchange_assignment %}
+                <p class="exchange-assignment">You're buying for: <strong>{{ gift_exchange_assignment.first_name }} {{ gift_exchange_assignment.last_name }}</strong></p>
+            {% endif %}
+        </div>
+    {% elif is_creator %}
+        <div class="gift-exchange-setup">
+            <h3>Start a Gift Exchange</h3>
+            <p>Randomly assign each member one person to buy a gift for!</p>
+            <form method="POST" action="{{ url_for('start_gift_exchange', group_id=group.id) }}">
+                <button type="submit" class="btn-primary">Start Gift Exchange</button>
+            </form>
+        </div>
+    {% endif %}
 
     <h2>Member Gift Lists</h2>
     
@@ -23,9 +42,12 @@
     {% else %}
         {% for member in member_gifts %}
             <div class="member-section">
-                <h3>{{ member.user.username }}
+                <h3>{{ member.user.first_name }}'s List
                     {% if member.claimed_by_me > 0 %}
                         <span class="badge-success">{{ member.claimed_by_me }} claimed by you</span>
+                    {% endif %}
+                    {% if gift_exchange_assignment and gift_exchange_assignment.id == member.user.id %}
+                        <span class="badge-exchange">Your Gift Exchange Match! 🎁</span>
                     {% endif %}
                 </h3>
                 
