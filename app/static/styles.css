@@ -52,11 +52,18 @@ a:hover {
 }
 
 .toolbar-brand {
-    font-size: 26px;  /* Increased from 20px */
+    font-size: 22px;
     font-weight: 700;
     color: white;
     text-decoration: none;
     letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.toolbar-brand p {
+    margin: 8px 0px 0px 0px;
 }
 
 .toolbar-nav {
@@ -69,12 +76,12 @@ a:hover {
 .toolbar a {
     color: white;
     text-decoration: none;
-    padding: 10px 18px;  /* Increased padding */
+    padding: 10px 18px;
     border-radius: 6px;
     font-weight: 500;
     transition: all 0.3s ease;
     background: rgba(255, 255, 255, 0.1);
-    font-size: 16px;  /* Increased from 14px */
+    font-size: 18px;
     white-space: nowrap;
 }
 
@@ -105,8 +112,8 @@ a:hover {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-image: url("/static/gifts.svg");
-  background-size: 300px 300px;
+  background-image: url("/static/oneslice-gray.png");
+  background-size: 648px 450px;
   background-position: center;
   background-repeat: repeat;
   padding: 20px;

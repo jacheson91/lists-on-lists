@@ -5,10 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Gift Registry{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="icon" type="image/x-icon" href="/favicon.png">
 </head>
 <body>
     <div class="toolbar">
-        <a href="{{ url_for('dashboard') }}" class="toolbar-brand">🎁 Giftly</a>
+        <a href="{{ url_for('dashboard') }}" class="toolbar-brand">
+            <div class="toolbar-brand">
+              <img src="/static/favicon.png">
+              <p>Giftster</p>
+            </div>
+          </a>
         <nav class="toolbar-nav">
             <a href="{{ url_for('dashboard') }}">Dashboard</a>
             <a href="{{ url_for('create_group') }}">Create Group</a>
