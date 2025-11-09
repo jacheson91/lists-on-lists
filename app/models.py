@@ -4,7 +4,7 @@ from flask_login import UserMixin
 import secrets
 from datetime import datetime
 
-db = firestore.Client()
+db = firestore.Client(database='giftster-db')
 
 class User(UserMixin):
     def __init__(self, user_id, data=None):
