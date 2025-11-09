@@ -25,4 +25,4 @@ RUN mkdir -p /app/instance
 EXPOSE 8080
 
 # Run the application
-CMD ["python", "run.py"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "2", "--timeout", "300", "run:app"]
