@@ -87,11 +87,11 @@
                                     </td>
                                     <td>
                                         {% if gift.claimer_id == current_user.id %}
-                                            <form method="POST" action="{{ url_for('unclaim_item', item_id=gift.id) }}" style="display:inline;">
+                                            <form method="POST" action="{{ url_for('unclaim_item', group_id=group.id, gift_id=gift.id) }}" style="display:inline;">
                                                 <button type="submit" class="btn-small btn-unclaim">Unclaim</button>
                                             </form>
                                         {% elif not gift.is_claimed %}
-                                            <form method="POST" action="{{ url_for('claim_item', item_id=gift.id) }}" style="display:inline;">
+                                            <form method="POST" action="{{ url_for('claim_item', group_id=group.id, gift_id=gift.id) }}" style="display:inline;">
                                                 <button type="submit" class="btn-small btn-claim">Claim</button>
                                             </form>
                                         {% endif %}

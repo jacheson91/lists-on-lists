@@ -34,7 +34,7 @@
                             {% endif %}
                         </td>
                         <td>
-                            <form method="POST" action="{{ url_for('delete_item', item_id=gift.id) }}" style="display: inline;">
+                            <form method="POST" action="{{ url_for('delete_item', group_id=group.id, gift_id=gift.id) }}" style="display: inline;">
                                 <button type="submit" class="btn-delete-gift">Delete</button>
                             </form>
                         </td>
