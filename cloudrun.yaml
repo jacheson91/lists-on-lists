@@ -1,0 +1,15 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: giftster
+spec:
+  template:
+    spec:
+      containers:
+      - image: us-central1-docker.pkg.dev/list-app-475800/cloud-run-source-deploy/lists-on-lists/lists-on-lists:latest
+        env:
+        - name: RESEND_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: RESEND_API_KEY
+              key: latest
