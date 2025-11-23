@@ -2,6 +2,7 @@ from flask import render_template, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from app import app, login_manager
 from app.models import User, Group, GiftList, get_user_groups
+from app.utils import send_reset_email, get_serializer
 import random
 
 @login_manager.user_loader
@@ -60,6 +61,78 @@ def logout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    """Request password reset"""
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    
+    if request.method == 'POST':
+        email = request.form['email']
+        user = User.get_by_email(email)
+        
+        if user:
+            # Generate reset token
+            serializer = get_serializer()
+            token = serializer.dumps(email, salt='password-reset-salt')
+            
+            # Create reset URL
+            reset_url = url_for('reset_password', token=token, _external=True)
+            
+            # Send email (for now just prints to console)
+            send_reset_email(email, reset_url)
+            
+        # Always show success message (don't reveal if email exists)
+        flash('If that email exists, a password reset link has been sent.', 'info')
+        return redirect(url_for('login'))
+    
+    return render_template('forgot_password.html')
+
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    """Reset password with token"""
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    
+    try:
+        # Verify token (valid for 1 hour)
+        serializer = get_serializer()
+        email = serializer.loads(token, salt='password-reset-salt', max_age=3600)
+    except:
+        flash('The password reset link is invalid or has expired.', 'danger')
+        return redirect(url_for('forgot_password'))
+    
+    if request.method == 'POST':
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+        
+        if password != confirm_password:
+            flash('Passwords do not match.', 'danger')
+            return render_template('reset_password.html', token=token)
+        
+        if len(password) < 6:
+            flash('Password must be at least 6 characters.', 'danger')
+            return render_template('reset_password.html', token=token)
+        
+        # Update password in Firestore
+        user = User.get_by_email(email)
+        if user:
+            from google.cloud import firestore
+            from werkzeug.security import generate_password_hash
+            
+            db = firestore.Client()
+            db.collection('users').document(user.id).update({
+                'password_hash': generate_password_hash(password)
+            })
+            
+            flash('Your password has been reset successfully!', 'success')
+            return redirect(url_for('login'))
+        else:
+            flash('User not found.', 'danger')
+            return redirect(url_for('forgot_password'))
+    
+    return render_template('reset_password.html', token=token)
 
 @app.route('/dashboard', methods=['GET'])
 @login_required
