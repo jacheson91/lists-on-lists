@@ -6,7 +6,7 @@ spec:
   template:
     spec:
       containers:
-      - image: us-central1-docker.pkg.dev/list-app-475800/cloud-run-source-deploy/lists-on-lists/lists-on-lists:latest
+      - name: placeholder-1
         env:
         - name: RESEND_API_KEY
           valueFrom:

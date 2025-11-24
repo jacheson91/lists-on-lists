@@ -12,6 +12,4 @@ def send_reset_email(user_email, reset_url):
     })
 
 def get_serializer():
-    from itsdangerous import URLSafeTimedSerializer
-    from flask import current_app
     return URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
