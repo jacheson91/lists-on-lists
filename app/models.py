@@ -47,6 +47,14 @@ class User(UserMixin):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
     
+    def update_password(self, new_password):
+        """Update user's password"""
+        new_hash = generate_password_hash(new_password)
+        db.collection('users').document(self.id).update({
+            'password_hash': new_hash
+        })
+        self.password_hash = new_hash
+    
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"

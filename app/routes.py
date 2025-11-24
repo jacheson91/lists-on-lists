@@ -115,17 +115,10 @@ def reset_password(token):
             flash('Password must be at least 6 characters.', 'danger')
             return render_template('reset_password.html', token=token)
         
-        # Update password in Firestore
+        # Update password using the model method
         user = User.get_by_email(email)
         if user:
-            from google.cloud import firestore
-            from werkzeug.security import generate_password_hash
-            
-            db = firestore.Client()
-            db.collection('users').document(user.id).update({
-                'password_hash': generate_password_hash(password)
-            })
-            
+            user.update_password(password)
             flash('Your password has been reset successfully!', 'success')
             return redirect(url_for('login'))
         else:
