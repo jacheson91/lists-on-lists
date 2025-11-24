@@ -32,3 +32,6 @@ images:
 
 # Optional: Set timeout (default is 10 minutes)
 timeout: '1200s'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
