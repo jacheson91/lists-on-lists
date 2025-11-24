@@ -13,8 +13,8 @@ steps:
     args:
       - '-c'
       - |
-        DIGEST=$(gcloud container images describe gcr.io/$PROJECT_ID/lists-on-lists:latest --format='get(image_summary.digest)')
-        sed -i "s|image:.*|image: gcr.io/$PROJECT_ID/lists-on-lists@$DIGEST|g" cloudrun.yaml
+        DIGEST=$$(gcloud container images describe gcr.io/$PROJECT_ID/lists-on-lists:latest --format='get(image_summary.digest)')
+        sed -i "s|image:.*|image: gcr.io/$PROJECT_ID/lists-on-lists@$$DIGEST|g" cloudrun.yaml
   
   # Step 4: Deploy using cloudrun.yaml
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
