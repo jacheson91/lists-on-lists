@@ -10,7 +10,7 @@
 
 body {
     font-family: 'Nunito', sans-serif;
-    background: #3b995f;
+    background-color: #d9d9d9;
     color: #333;
     margin: 0;
     padding: 0;
@@ -764,7 +764,6 @@ table th {
     }
     
     .toolbar-nav {
-        width: 100%;
         justify-content: center;
         margin-top: 10px;
     }
@@ -887,15 +886,6 @@ table th {
     
     table {
         min-width: 600px;
-    }
-
-    .toolbar-brand {
-        font-size: 20px;  /* Even smaller for very small screens */
-    }
-    
-    .toolbar a {
-        padding: 8px 12px;
-        font-size: 14px;
     }
     
     .general-card h1 {

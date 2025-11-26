@@ -10,16 +10,14 @@
 <body>
     <div class="toolbar">
         <a href="{{ url_for('dashboard') }}" class="toolbar-brand">
-            <div class="toolbar-brand">
-              <img src="/static/favicon.png">
-              <p>Giftster</p>
-            </div>
-          </a>
+          <div class="toolbar-brand">
+            <img src="/static/favicon.png">
+            <p>Giftster</p>
+          </div>
+        </a>
         <nav class="toolbar-nav">
-            <a href="{{ url_for('dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('create_group') }}">Create Group</a>
-            <a href="{{ url_for('join_group') }}">Join Group</a>
-            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+          <a href="{{ url_for('dashboard') }}">Dashboard</a>
+          <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
         </nav>
     </div>
     <div class="flash-container">
