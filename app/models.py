@@ -1,10 +1,14 @@
 from google.cloud import firestore
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+import os
 import secrets
-from datetime import datetime
 
-db = firestore.Client(database='giftster-db')
+# Locally, FIRESTORE_EMULATOR_HOST points this client at the emulator instead of production.
+# The emulator ignores the environment's project unless it's passed explicitly; in production
+# GOOGLE_CLOUD_PROJECT is unset and the project is inferred as before.
+db = firestore.Client(project=os.environ.get('GOOGLE_CLOUD_PROJECT'),
+                      database=os.environ.get('FIRESTORE_DATABASE', 'giftster-db'))
 
 class User(UserMixin):
     def __init__(self, user_id, data=None):
