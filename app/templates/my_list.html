@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import item_fields, item_details %}
+{% from "_macros.html" import item_fields, item_details, likes_box %}
 
 {% block title %}My Gifts{% endblock %}
 
@@ -12,6 +12,14 @@
             <a href="{{ url_for('dashboard') }}" class="btn-secondary">Back to Dashboard</a>
         </div>
     </div>
+
+    {% if current_user.likes or current_user.dislikes %}
+        <p class="hint">The group also sees your likes &amp; dislikes (<a href="{{ url_for('wishlist', _anchor='likes') }}">edit</a>):</p>
+        {{ likes_box(current_user) }}
+    {% else %}
+        <p class="hint">Add your <a href="{{ url_for('wishlist', _anchor='likes') }}">likes &amp; dislikes</a> to give people ideas beyond your list.</p>
+    {% endif %}
+
     {% if gifts|length > 0 %}
         <ul class="item-list">
             {% for gift in gifts %}

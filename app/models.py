@@ -18,6 +18,9 @@ class User(UserMixin):
             self.last_name = data.get('last_name', '')
             self.email = data.get('email', '')
             self.password_hash = data.get('password_hash', '')
+            # Free text shown next to the user's name in all their groups
+            self.likes = data.get('likes', '')
+            self.dislikes = data.get('dislikes', '')
     
     @staticmethod
     def get(user_id):
@@ -58,7 +61,13 @@ class User(UserMixin):
             'password_hash': new_hash
         })
         self.password_hash = new_hash
-    
+
+    def update_likes(self, likes, dislikes):
+        """Update the likes/dislikes shown to the user's groups"""
+        fields = {'likes': clean_text(likes), 'dislikes': clean_text(dislikes)}
+        db.collection('users').document(self.id).update(fields)
+        self.likes, self.dislikes = fields['likes'], fields['dislikes']
+
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"

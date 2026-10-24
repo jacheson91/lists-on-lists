@@ -34,3 +34,17 @@
     {% if caller %}{{ caller() }}{% endif %}
 </div>
 {% endmacro %}
+
+{# A person's likes and dislikes, or nothing if they haven't filled them in #}
+{% macro likes_box(user) %}
+{% if user.likes or user.dislikes %}
+<div class="likes-box">
+    {% if user.likes %}
+        <p><span class="likes-label">👍 Likes</span> {{ user.likes }}</p>
+    {% endif %}
+    {% if user.dislikes %}
+        <p><span class="likes-label">👎 Dislikes</span> {{ user.dislikes }}</p>
+    {% endif %}
+</div>
+{% endif %}
+{% endmacro %}

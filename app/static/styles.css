@@ -721,16 +721,19 @@ button:disabled {
     accent-color: #00a3a3;
 }
 
-/* Stays in view at the bottom of the screen while scrolling a long wishlist */
 .copy-bar {
-    position: sticky;
-    bottom: 10px;
     margin-top: 15px;
     padding: 12px 14px;
     background: white;
     border: 2px solid #00a3a3;
     border-radius: 10px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Once something is ticked, keep the bar in view at the bottom of the screen while scrolling */
+.general-card:has(input[form="copy-form"]:checked) .copy-bar {
+    position: sticky;
+    bottom: 10px;
 }
 
 .copy-bar label {
@@ -799,6 +802,61 @@ button:disabled {
 .hint {
     color: #666;
     font-size: 15px;
+}
+
+/* Likes & dislikes */
+.likes-box {
+    margin: 10px 0;
+    padding: 10px 14px;
+    background: white;
+    border-radius: 10px;
+    border: 1px dashed #a3d6d2;
+    color: #333;
+    text-align: left;
+}
+
+.likes-box p {
+    margin: 4px 0;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.likes-label {
+    font-weight: 700;
+    margin-right: 4px;
+    white-space: nowrap;
+}
+
+.gift-exchange-banner .likes-box {
+    max-width: 600px;
+    margin: 15px auto 0;
+    border: none;
+}
+
+.likes-section {
+    margin-bottom: 25px;
+    padding: 14px 16px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.likes-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.likes-section h2,
+.wishlist-heading {
+    margin: 0;
+    font-size: 20px;
+}
+
+.likes-section .likes-box {
+    border-style: solid;
+    background: #f8fdfc;
 }
 
 /* Author display rules like .item-row's flex would otherwise override the hidden attribute */

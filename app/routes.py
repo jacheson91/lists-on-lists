@@ -480,3 +480,16 @@ def copy_wishlist_items():
         message += f' {skipped} {"was" if skipped == 1 else "were"} already there.'
     flash(message, 'success')
     return redirect(url_for('my_list', group_id=group.id))
+
+@app.route('/likes', methods=['POST'])
+@login_required
+def update_likes():
+    """Save the user's likes/dislikes, shown to all their groups"""
+    current_user.update_likes(request.form.get('likes', ''), request.form.get('dislikes', ''))
+    flash('Your likes and dislikes have been saved.', 'success')
+    
+    # Only follow paths within this site
+    next_url = request.form.get('next', '')
+    if not next_url.startswith('/') or next_url.startswith('//'):
+        next_url = url_for('wishlist')
+    return redirect(next_url)

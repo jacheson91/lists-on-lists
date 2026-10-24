@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import item_details %}
+{% from "_macros.html" import item_details, likes_box %}
 
 {# Shown to the claimer when the owner has changed an item since it was claimed #}
 {% macro edit_alert(gift) %}
@@ -47,6 +47,7 @@
             <h2>🎁 Gift Exchange Active!</h2>
             {% if gift_exchange_assignment %}
                 <p class="exchange-assignment">You're buying for: <strong>{{ gift_exchange_assignment.first_name }} {{ gift_exchange_assignment.last_name }}</strong></p>
+                {{ likes_box(gift_exchange_assignment) }}
             {% endif %}
         </div>
     {% elif is_creator %}
@@ -74,6 +75,7 @@
                         <span class="badge-exchange">Your Gift Exchange Match! 🎁</span>
                     {% endif %}
                 </h3>
+                {{ likes_box(member.user) }}
 
                 {% if member.gifts|length == 0 %}
                     <p class="text-muted">No gifts added yet</p>

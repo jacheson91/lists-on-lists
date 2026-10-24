@@ -56,7 +56,7 @@ Tests use their own emulator project and wipe it before each test, so they don't
 ## Data model (Firestore)
 
 ```
-users/{uid}               first_name, last_name, email, password_hash
+users/{uid}               first_name, last_name, email, password_hash, likes, dislikes
   private_items/{id}      item_name, description, link, created_at       (private wishlist, owner only)
 groups/{gid}              name, description, join_code, created_by, created_at, has_gift_exchange
   members/{uid}           joined_at

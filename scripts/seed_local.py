@@ -37,6 +37,12 @@ def seed():
                         ('Dan', 'Jones'), ('Erin', 'Smith')]:
         users[first] = User.create(first, last, f'{first.lower()}@example.com', SEED_PASSWORD)
 
+    # Dan is left blank to show how a member without likes/dislikes looks
+    users['Alice'].update_likes('Earl Grey, mystery novels, anything green', 'Glitter')
+    users['Ben'].update_likes('Coffee, cycling gear, hot sauce', 'Novelty socks')
+    users['Carol'].update_likes('Dark chocolate, crosswords, anything lavender', 'Mugs, scented candles')
+    users['Erin'].update_likes('Cats, watercolours, cosy things', '')
+
     family = Group.create('Smith Family Christmas', 'Presents under the tree at Grandma\'s',
                           users['Alice'].id)
     for name in ['Ben', 'Carol', 'Dan', 'Erin']:

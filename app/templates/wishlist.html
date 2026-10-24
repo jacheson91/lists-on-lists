@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import item_fields, item_details %}
+{% from "_macros.html" import item_fields, item_details, likes_box %}
 
 {% block title %}My Wishlist{% endblock %}
 
@@ -11,6 +11,38 @@
             <p>🔒 Only you can see this list. Copy items into a group when you want to share them.</p>
         </div>
     </div>
+
+    <section class="likes-section" id="likes">
+        <div class="likes-section-header">
+            <h2>My likes &amp; dislikes</h2>
+            <button type="button" class="btn-small btn-edit" onclick="toggleEdit('likes')">Edit</button>
+        </div>
+        <p class="hint">Shown next to your name in all your groups, which helps with stocking fillers and gift exchanges.</p>
+        <div id="view-likes">
+            {% if current_user.likes or current_user.dislikes %}
+                {{ likes_box(current_user) }}
+            {% else %}
+                <p class="text-muted">Not filled in yet.</p>
+            {% endif %}
+        </div>
+        <form id="edit-likes" method="POST" action="{{ url_for('update_likes') }}" hidden>
+            <input type="hidden" name="next" value="{{ url_for('wishlist', _anchor='likes') }}">
+            <div class="form-group">
+                <label for="likes">👍 Likes</label>
+                <textarea id="likes" name="likes" rows="3" maxlength="1000"
+                          placeholder="e.g. dark chocolate, crosswords, anything lavender">{{ current_user.likes }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="dislikes">👎 Dislikes</label>
+                <textarea id="dislikes" name="dislikes" rows="3" maxlength="1000"
+                          placeholder="e.g. mugs, scented candles">{{ current_user.dislikes }}</textarea>
+            </div>
+            <button type="submit" class="btn-primary">Save</button>
+            <button type="button" class="btn-secondary" onclick="this.form.reset(); toggleEdit('likes')">Cancel</button>
+        </form>
+    </section>
+
+    <h2 class="wishlist-heading">Wishlist items</h2>
 
     {% if items %}
         {# The checkboxes join this form through their form="copy-form" attribute, because
