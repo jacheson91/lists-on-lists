@@ -36,7 +36,14 @@
                             <span class="stat-label">Need Gifts</span>
                         </div>
                     </div>
-                    
+
+                    {% if item.updated_claims_count %}
+                        <a class="group-alert" href="{{ url_for('group_detail', group_id=item.group.id) }}">
+                            ✏️ {{ item.updated_claims_count }} gift{{ 's' if item.updated_claims_count > 1 }} you claimed
+                            {{ 'have' if item.updated_claims_count > 1 else 'has' }} been updated
+                        </a>
+                    {% endif %}
+
                     <div class="group-info">
                         <p><strong>Join Code:</strong> <code>{{ item.group.join_code }}</code></p>
                     </div>

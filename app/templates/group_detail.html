@@ -1,4 +1,28 @@
 {% extends "base.html" %}
+{% from "_macros.html" import item_details %}
+
+{# Shown to the claimer when the owner has changed an item since it was claimed #}
+{% macro edit_alert(gift) %}
+{% set labels = {'item_name': 'Name', 'description': 'Description', 'link': 'Link'} %}
+<div class="edit-alert">
+    <strong>✏️ Updated since you claimed it</strong>
+    <ul>
+        {% for change in gift.edit_changes %}
+            <li>
+                <span class="edit-field">{{ labels[change.field] }}:</span>
+                {% if change.field == 'link' %}
+                    {% if change.new %}<a href="{{ change.new }}" target="_blank" rel="noopener">new link ↗</a>{% else %}removed{% endif %}
+                {% else %}
+                    <s>{{ change.old or 'none' }}</s> → {{ change.new or 'none' }}
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    <form method="POST" action="{{ url_for('dismiss_edit_alert', group_id=gift.group_id, gift_id=gift.id) }}">
+        <button type="submit" class="btn-small btn-dismiss">Got it</button>
+    </form>
+</div>
+{% endmacro %}
 
 {% block title %}{{ group.name }}{% endblock %}
 
@@ -57,30 +81,27 @@
                     <ul class="item-list">
                         {% for gift in member.gifts %}
                             <li class="item-card" id="item-{{ gift.id }}">
-                                <div class="item-body">
-                                    <div class="item-name">{{ gift.item_name }}</div>
-                                    {% if gift.description %}
-                                        <p class="item-description">{{ gift.description }}</p>
-                                    {% endif %}
-                                    {% if gift.link %}
-                                        <a class="item-link" href="{{ gift.link }}" target="_blank" rel="noopener">View item ↗</a>
-                                    {% endif %}
+                                <div class="item-row">
+                                    {{ item_details(gift) }}
+                                    <div class="item-actions">
+                                        {% if gift.claimer_id == current_user.id %}
+                                            <span class="badge-success">Claimed by you</span>
+                                            <form method="POST" action="{{ url_for('unclaim_item', group_id=group.id, gift_id=gift.id) }}">
+                                                <button type="submit" class="btn-small btn-unclaim">Unclaim</button>
+                                            </form>
+                                        {% elif gift.is_claimed %}
+                                            <span class="badge-claimed">Claimed</span>
+                                        {% else %}
+                                            <span class="badge-available">Available</span>
+                                            <form method="POST" action="{{ url_for('claim_item', group_id=group.id, gift_id=gift.id) }}">
+                                                <button type="submit" class="btn-small btn-claim">Claim</button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                                <div class="item-actions">
-                                    {% if gift.claimer_id == current_user.id %}
-                                        <span class="badge-success">Claimed by you</span>
-                                        <form method="POST" action="{{ url_for('unclaim_item', group_id=group.id, gift_id=gift.id) }}">
-                                            <button type="submit" class="btn-small btn-unclaim">Unclaim</button>
-                                        </form>
-                                    {% elif gift.is_claimed %}
-                                        <span class="badge-claimed">Claimed</span>
-                                    {% else %}
-                                        <span class="badge-available">Available</span>
-                                        <form method="POST" action="{{ url_for('claim_item', group_id=group.id, gift_id=gift.id) }}">
-                                            <button type="submit" class="btn-small btn-claim">Claim</button>
-                                        </form>
-                                    {% endif %}
-                                </div>
+                                {% if gift.claimer_id == current_user.id and gift.edited_since_claim %}
+                                    {{ edit_alert(gift) }}
+                                {% endif %}
                             </li>
                         {% endfor %}
                     </ul>

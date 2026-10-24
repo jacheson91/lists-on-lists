@@ -185,18 +185,24 @@ class GiftList:
             self.link = data.get('link', '')
             self.is_claimed = data.get('is_claimed', False)
             self.claimer_id = data.get('claimer_id')
-    
+            # Set when the owner edits an item someone has claimed, until the claimer dismisses it.
+            # edit_changes is a list of {'field', 'old', 'new'} dicts, one per changed field.
+            self.edited_since_claim = data.get('edited_since_claim', False)
+            self.edit_changes = data.get('edit_changes', [])
+
     @staticmethod
     def create(group_id, user_id, item_name, description='', link=''):
         """Create a new gift list item"""
         gift_ref = db.collection('groups').document(group_id).collection('gift_lists').document()
         gift_data = {
             'user_id': user_id,
-            'item_name': item_name,
-            'description': description,
-            'link': link,
+            'item_name': clean_text(item_name),
+            'description': clean_text(description),
+            'link': clean_text(link),
             'is_claimed': False,
-            'claimer_id': None
+            'claimer_id': None,
+            'edited_since_claim': False,
+            'edit_changes': []
         }
         gift_ref.set(gift_data)
         return GiftList(gift_ref.id, group_id, gift_data)
@@ -233,11 +239,53 @@ class GiftList:
     
     def claim(self, claimer_id):
         """Claim this gift"""
-        self.update(is_claimed=True, claimer_id=claimer_id)
-    
+        self.update(is_claimed=True, claimer_id=claimer_id, edited_since_claim=False, edit_changes=[])
+
     def unclaim(self):
         """Unclaim this gift"""
-        self.update(is_claimed=False, claimer_id=None)
+        self.update(is_claimed=False, claimer_id=None, edited_since_claim=False, edit_changes=[])
+
+    def edit(self, item_name, description, link):
+        """Owner edits the item. If it's claimed, record what changed so the claimer is told."""
+        new_values = {'item_name': clean_text(item_name),
+                      'description': clean_text(description),
+                      'link': clean_text(link)}
+        # Clean the stored values too, since older items were saved without clean_text
+        current = {field: clean_text(getattr(self, field)) for field in new_values}
+        if new_values == current:
+            return
+
+        fields = dict(new_values)
+        if self.is_claimed:
+            fields['edit_changes'] = merge_edit_changes(
+                self.edit_changes,
+                {field: (current[field], new_values[field]) for field in new_values})
+            # Editing something and then changing it back leaves nothing to tell the claimer
+            fields['edited_since_claim'] = bool(fields['edit_changes'])
+        self.update(**fields)
+
+    def dismiss_edit_alert(self):
+        """Claimer has seen the changes"""
+        self.update(edited_since_claim=False, edit_changes=[])
+
+
+def clean_text(text):
+    """Trim form input and normalise browser line endings so edits compare cleanly"""
+    return (text or '').replace('\r\n', '\n').strip()
+
+
+def merge_edit_changes(existing, updates):
+    """Fold {field: (old, new)} into a list of change dicts, keeping each field's original value
+    from when it was claimed and dropping fields that end up back where they started"""
+    changes = {change['field']: dict(change) for change in existing}
+    for field, (old, new) in updates.items():
+        if old == new:
+            continue
+        change = changes.setdefault(field, {'field': field, 'old': old})
+        change['new'] = new
+        if change['old'] == change['new']:
+            del changes[field]
+    return list(changes.values())
 
 
 def get_user_groups(user_id):

@@ -523,6 +523,7 @@ a:hover {
   color: #333;
   border: none;
   border-radius: 6px;
+  font-family: inherit;
   font-size: 16px;
   font-weight: 600;
   white-space: nowrap;
@@ -609,6 +610,10 @@ button:disabled {
     border-radius: 10px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
     padding: 14px 16px;
+}
+
+/* Details on the left, status and buttons on the right; extras (edit form, alerts) go below */
+.item-row {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -648,6 +653,58 @@ button:disabled {
 
 .item-actions form {
     margin: 0;
+}
+
+.btn-edit {
+    background: #00a3a3;
+    color: white;
+}
+
+.item-edit-form {
+    margin-top: 4px;
+}
+
+/* Claimer's notice that the owner changed an item */
+.edit-alert {
+    margin-top: 12px;
+    padding: 12px 14px;
+    background: #fff8e1;
+    border-left: 4px solid #ffd136;
+    border-radius: 6px;
+}
+
+.edit-alert ul {
+    margin: 6px 0 10px;
+    padding-left: 20px;
+    list-style: disc;
+}
+
+.edit-alert s {
+    color: #888;
+}
+
+.edit-field {
+    font-weight: 600;
+}
+
+.btn-dismiss {
+    background: #555;
+    color: white;
+}
+
+.group-alert {
+    display: block;
+    margin: -5px 0 15px;
+    padding: 8px 12px;
+    background: #fff8e1;
+    border-radius: 6px;
+    color: #6b5200;
+    font-weight: 600;
+}
+
+/* Author display rules like .item-row's flex would otherwise override the hidden attribute */
+[hidden] {
+    display: none !important;
 }
 
 .member-heading {
@@ -913,8 +970,11 @@ button:disabled {
 
     /* Item cards stack: details on top, status and buttons in a row underneath */
     .item-card {
-        flex-direction: column;
         padding: 12px 14px;
+    }
+
+    .item-row {
+        flex-direction: column;
     }
 
     .item-actions {

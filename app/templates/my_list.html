@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% from "_macros.html" import item_fields, item_details %}
 
 {% block title %}My Gifts{% endblock %}
 
 {% block content %}
 <div class="general-card">
     <div class="header">
-        <h1>My List</h1>
+        <h1>My list for {{ group.name }}</h1>
         <div class="header-actions">
             <a href="{{ url_for('group_detail', group_id=group.id) }}" class="btn-primary">Back to Group</a>
             <a href="{{ url_for('dashboard') }}" class="btn-secondary">Back to Dashboard</a>
@@ -15,21 +16,22 @@
         <ul class="item-list">
             {% for gift in gifts %}
                 <li class="item-card" id="item-{{ gift.id }}">
-                    <div class="item-body">
-                        <div class="item-name">{{ gift.item_name }}</div>
-                        {% if gift.description %}
-                            <p class="item-description">{{ gift.description }}</p>
-                        {% endif %}
-                        {% if gift.link %}
-                            <a class="item-link" href="{{ gift.link }}" target="_blank" rel="noopener">View item ↗</a>
-                        {% endif %}
+                    <div class="item-row" id="view-{{ gift.id }}">
+                        {{ item_details(gift) }}
+                        <div class="item-actions">
+                            <button type="button" class="btn-small btn-edit" onclick="toggleEdit('{{ gift.id }}')">Edit</button>
+                            <form method="POST" action="{{ url_for('delete_item', group_id=group.id, gift_id=gift.id) }}"
+                                  onsubmit="return confirm('Delete this item from your list?')">
+                                <button type="submit" class="btn-small btn-delete-gift">Delete</button>
+                            </form>
+                        </div>
                     </div>
-                    <div class="item-actions">
-                        <form method="POST" action="{{ url_for('delete_item', group_id=group.id, gift_id=gift.id) }}"
-                              onsubmit="return confirm('Delete this item from your list?')">
-                            <button type="submit" class="btn-small btn-delete-gift">Delete</button>
-                        </form>
-                    </div>
+                    <form class="item-edit-form" id="edit-{{ gift.id }}" method="POST" hidden
+                          action="{{ url_for('edit_item', group_id=group.id, gift_id=gift.id) }}">
+                        {{ item_fields(gift, 'edit-' ~ gift.id ~ '-') }}
+                        <button type="submit" class="btn-primary">Save</button>
+                        <button type="button" class="btn-secondary" onclick="this.form.reset(); toggleEdit('{{ gift.id }}')">Cancel</button>
+                    </form>
                 </li>
             {% endfor %}
         </ul>
@@ -41,25 +43,11 @@
         <button onclick="toggleGiftForm()" class="btn-add-gift" id="toggleButton">
             Add Gift
         </button>
-        
+
         <div class="add-gift-form" id="giftForm" style="display: none;">
             <h3>Add a New Gift</h3>
             <form method="POST" action="{{ url_for('my_list', group_id=group.id) }}">
-                <div class="form-group">
-                    <label for="item_name">Item Name *</label>
-                    <input type="text" id="item_name" name="item_name" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" name="description" rows="3" placeholder="e.g. size, color, etc."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="link">Link (URL)</label>
-                    <input type="url" id="link" name="link" placeholder="https://example.com/product">
-                </div>
-                
+                {{ item_fields(id_prefix='new-') }}
                 <button type="submit" class="btn-primary">Add Gift</button>
                 <button type="button" onclick="toggleGiftForm()" class="btn-secondary">Cancel</button>
             </form>
@@ -70,13 +58,21 @@
     function toggleGiftForm() {
         const form = document.getElementById('giftForm');
         const button = document.getElementById('toggleButton');
-        
+
         if (form.style.display === 'none') {
             form.style.display = 'block';
             button.style.display = 'none';
         } else {
             form.style.display = 'none';
             button.style.display = 'block';
+        }
+    }
+
+    // Swap an item between its normal view and its edit form
+    function toggleEdit(giftId) {
+        for (const id of ['view-' + giftId, 'edit-' + giftId]) {
+            const el = document.getElementById(id);
+            el.hidden = !el.hidden;
         }
     }
     </script>

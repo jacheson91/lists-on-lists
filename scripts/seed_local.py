@@ -56,10 +56,16 @@ def seed():
         ('Erin', 'Fuzzy slippers', 'Size 6', '', 'Dan'),
         ('Erin', 'Watercolour set', 'For a beginner', 'https://example.com/paints', None),
     ]
+    gifts = {}
     for owner, name, description, link, claimer in family_items:
         gift = GiftList.create(family.id, users[owner].id, name, description, link)
         if claimer:
             gift.claim(users[claimer].id)
+        gifts[name] = gift
+
+    # Ben changes something Alice already claimed, so Alice sees the "updated" notice
+    gifts['Bike lights'].edit('Bike lights', 'USB-C rechargeable, front and back, 100+ lumens',
+                              'https://example.com/brighter-lights')
 
     cousins = Group.create('Cousins Secret Santa', '£20 limit', users['Carol'].id)
     for name in ['Dan', 'Erin', 'Alice']:

@@ -138,21 +138,25 @@ def dashboard():
         # Get all members of this group
         members = group.get_members()
         
-        # Count how many people the current user still needs to buy for
+        # Count how many people the current user still needs to buy for, and how many of
+        # the gifts they've claimed have been edited since
         needs_gift = 0
+        updated_claims = 0
         for member in members:
             if member.id != current_user.id:
                 # Get gifts for this member in this group
                 member_gifts = GiftList.get_by_user(group.id, member.id)
                 # Check if current user has claimed any
-                claimed_by_me = sum(1 for g in member_gifts if g.claimer_id == current_user.id)
-                if claimed_by_me == 0:
+                claimed_by_me = [g for g in member_gifts if g.claimer_id == current_user.id]
+                if not claimed_by_me:
                     needs_gift += 1
-        
+                updated_claims += sum(1 for g in claimed_by_me if g.edited_since_claim)
+
         groups_data.append({
             'group': group,
             'member_count': len(members),
-            'needs_gift_count': needs_gift
+            'needs_gift_count': needs_gift,
+            'updated_claims_count': updated_claims
         })
     
     return render_template('dashboard.html', groups_data=groups_data)
@@ -324,6 +328,35 @@ def delete_item(group_id, gift_id):
     gift.delete()
     flash('Gift item deleted successfully.', 'success')
     return redirect(url_for('my_list', group_id=group_id))
+
+@app.route('/edit-item/<group_id>/<gift_id>', methods=['POST'])
+@login_required
+def edit_item(group_id, gift_id):
+    gift = GiftList.get(group_id, gift_id)
+    if not gift:
+        flash('Gift item not found', 'danger')
+        return redirect(url_for('dashboard'))
+
+    if gift.user_id != current_user.id:
+        flash('You can only edit items on your own list.', 'danger')
+        return redirect(url_for('dashboard'))
+
+    if not request.form['item_name'].strip():
+        flash('Item name is required.', 'danger')
+        return redirect(url_for('my_list', group_id=group_id))
+
+    # Same response whether or not it's claimed, so the owner can't tell
+    gift.edit(request.form['item_name'], request.form.get('description', ''), request.form.get('link', ''))
+    flash('Gift item updated.', 'success')
+    return redirect(url_for('my_list', group_id=group_id, _anchor=f'item-{gift_id}'))
+
+@app.route('/dismiss-edit-alert/<group_id>/<gift_id>', methods=['POST'])
+@login_required
+def dismiss_edit_alert(group_id, gift_id):
+    gift = GiftList.get(group_id, gift_id)
+    if gift and gift.claimer_id == current_user.id:
+        gift.dismiss_edit_alert()
+    return redirect(url_for('group_detail', group_id=group_id, _anchor=f'item-{gift_id}'))
 
 @app.route('/claim-item/<group_id>/<gift_id>', methods=['POST'])
 @login_required

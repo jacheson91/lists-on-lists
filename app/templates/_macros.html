@@ -1,0 +1,34 @@
+{# Name / description / link fields shared by the add and edit forms.
+   id_prefix keeps label/input ids unique when several forms are on one page. #}
+{% macro item_fields(item=None, id_prefix='') %}
+<div class="form-group">
+    <label for="{{ id_prefix }}item_name">Item Name *</label>
+    <input type="text" id="{{ id_prefix }}item_name" name="item_name" required
+           value="{{ item.item_name if item else '' }}">
+</div>
+
+<div class="form-group">
+    <label for="{{ id_prefix }}description">Description</label>
+    <textarea id="{{ id_prefix }}description" name="description" rows="3"
+              placeholder="e.g. size, color, etc.">{{ item.description if item else '' }}</textarea>
+</div>
+
+<div class="form-group">
+    <label for="{{ id_prefix }}link">Link (URL)</label>
+    <input type="url" id="{{ id_prefix }}link" name="link" placeholder="https://example.com/product"
+           value="{{ item.link if item else '' }}">
+</div>
+{% endmacro %}
+
+{# The name, description and link shown at the top of every item card #}
+{% macro item_details(item) %}
+<div class="item-body">
+    <div class="item-name">{{ item.item_name }}</div>
+    {% if item.description %}
+        <p class="item-description">{{ item.description }}</p>
+    {% endif %}
+    {% if item.link %}
+        <a class="item-link" href="{{ item.link }}" target="_blank" rel="noopener">View item ↗</a>
+    {% endif %}
+</div>
+{% endmacro %}
