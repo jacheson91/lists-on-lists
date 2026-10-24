@@ -137,7 +137,8 @@ a:hover {
   width: 100%;
   max-width: 1200px;
   min-height: auto;
-  overflow-x: auto;
+  /* No overflow setting here: it was for the old tables, and it would stop sticky elements
+     like the wishlist copy bar from sticking to the screen */
 }
 
 .general-card h1 {
@@ -700,6 +701,104 @@ button:disabled {
     border-radius: 6px;
     color: #6b5200;
     font-weight: 600;
+}
+
+/* Private wishlist: tick items, then copy them into a group */
+.item-select {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+}
+
+.item-select input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    margin: 3px 0 0;
+    flex-shrink: 0;
+    accent-color: #00a3a3;
+}
+
+/* Stays in view at the bottom of the screen while scrolling a long wishlist */
+.copy-bar {
+    position: sticky;
+    bottom: 10px;
+    margin-top: 15px;
+    padding: 12px 14px;
+    background: white;
+    border: 2px solid #00a3a3;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.copy-bar label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.copy-bar-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.copy-bar select {
+    flex: 1;
+    min-width: 0;
+    padding: 10px;
+    border: 2px solid #e1e1e1;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 16px;
+    background: white;
+}
+
+.copy-bar-controls .btn-primary {
+    width: auto;
+    margin-top: 0;
+}
+
+.wishlist-import {
+    margin-bottom: 15px;
+    padding: 12px 14px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.wishlist-import summary {
+    font-weight: 700;
+    color: #007b5e;
+    cursor: pointer;
+}
+
+.pick-list {
+    list-style: none;
+    margin: 12px 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.copied-to {
+    margin: 6px 0 0;
+    color: #007b5e;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.pick-description {
+    display: block;
+    color: #666;
+    font-size: 14px;
+}
+
+.hint {
+    color: #666;
+    font-size: 15px;
 }
 
 /* Author display rules like .item-row's flex would otherwise override the hidden attribute */

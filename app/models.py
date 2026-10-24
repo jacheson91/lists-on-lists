@@ -189,9 +189,12 @@ class GiftList:
             # edit_changes is a list of {'field', 'old', 'new'} dicts, one per changed field.
             self.edited_since_claim = data.get('edited_since_claim', False)
             self.edit_changes = data.get('edit_changes', [])
+            # Set when the item was copied from the owner's private wishlist
+            self.source_private_id = data.get('source_private_id')
+            self.created_at = data.get('created_at')
 
     @staticmethod
-    def create(group_id, user_id, item_name, description='', link=''):
+    def create(group_id, user_id, item_name, description='', link='', source_private_id=None):
         """Create a new gift list item"""
         gift_ref = db.collection('groups').document(group_id).collection('gift_lists').document()
         gift_data = {
@@ -202,7 +205,9 @@ class GiftList:
             'is_claimed': False,
             'claimer_id': None,
             'edited_since_claim': False,
-            'edit_changes': []
+            'edit_changes': [],
+            'source_private_id': source_private_id,
+            'created_at': firestore.SERVER_TIMESTAMP
         }
         gift_ref.set(gift_data)
         return GiftList(gift_ref.id, group_id, gift_data)
@@ -217,9 +222,15 @@ class GiftList:
     
     @staticmethod
     def get_by_user(group_id, user_id):
-        """Get all gifts for a user in a group"""
+        """Get all gifts for a user in a group, oldest first"""
         gifts_docs = db.collection('groups').document(group_id).collection('gift_lists').where('user_id', '==', user_id).stream()
-        return [GiftList(doc.id, group_id, doc.to_dict()) for doc in gifts_docs]
+        return GiftList._oldest_first([GiftList(doc.id, group_id, doc.to_dict()) for doc in gifts_docs])
+
+    @staticmethod
+    def _oldest_first(gifts):
+        # Sorted here rather than in the query to avoid needing a composite index.
+        # Items from before created_at existed have none, so they go first.
+        return sorted(gifts, key=lambda g: (g.created_at is not None, g.created_at or 0))
     
     @staticmethod
     def get_all_in_group(group_id):
@@ -267,6 +278,69 @@ class GiftList:
     def dismiss_edit_alert(self):
         """Claimer has seen the changes"""
         self.update(edited_since_claim=False, edit_changes=[])
+
+
+class PrivateItem:
+    """An item on a user's private wishlist, kept outside any group. Only its owner sees it;
+    copying it into a group creates an independent GiftList item."""
+
+    def __init__(self, item_id, user_id, data=None):
+        self.id = item_id
+        self.user_id = user_id
+        if data:
+            self.item_name = data.get('item_name', '')
+            self.description = data.get('description', '')
+            self.link = data.get('link', '')
+            self.created_at = data.get('created_at')
+
+    @staticmethod
+    def _collection(user_id):
+        return db.collection('users').document(user_id).collection('private_items')
+
+    @staticmethod
+    def create(user_id, item_name, description='', link=''):
+        """Add an item to a user's private wishlist"""
+        item_ref = PrivateItem._collection(user_id).document()
+        item_data = {
+            'item_name': clean_text(item_name),
+            'description': clean_text(description),
+            'link': clean_text(link),
+            'created_at': firestore.SERVER_TIMESTAMP
+        }
+        item_ref.set(item_data)
+        return PrivateItem(item_ref.id, user_id, item_data)
+
+    @staticmethod
+    def get(user_id, item_id):
+        """Get one of a user's private items"""
+        doc = PrivateItem._collection(user_id).document(item_id).get()
+        if doc.exists:
+            return PrivateItem(doc.id, user_id, doc.to_dict())
+        return None
+
+    @staticmethod
+    def get_by_user(user_id):
+        """Get a user's private wishlist, oldest first"""
+        docs = PrivateItem._collection(user_id).order_by('created_at').stream()
+        return [PrivateItem(doc.id, user_id, doc.to_dict()) for doc in docs]
+
+    def update(self, item_name, description, link):
+        """Change the item's details (copies already in groups are unaffected)"""
+        fields = {'item_name': clean_text(item_name),
+                  'description': clean_text(description),
+                  'link': clean_text(link)}
+        PrivateItem._collection(self.user_id).document(self.id).update(fields)
+        for key, value in fields.items():
+            setattr(self, key, value)
+
+    def delete(self):
+        """Remove from the private wishlist (copies already in groups are unaffected)"""
+        PrivateItem._collection(self.user_id).document(self.id).delete()
+
+    def copy_to_group(self, group_id):
+        """Add a copy of this item to the owner's list in a group"""
+        return GiftList.create(group_id, self.user_id, self.item_name, self.description, self.link,
+                               source_private_id=self.id)
 
 
 def clean_text(text):

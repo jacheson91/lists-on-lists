@@ -6,6 +6,7 @@
     <title>{% block title %}Giftster{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
 </head>
 <body>
     {% if current_user.is_authenticated %}
@@ -16,6 +17,7 @@
         </a>
         <nav class="toolbar-nav">
           <a href="{{ url_for('dashboard') }}">Dashboard</a>
+          <a href="{{ url_for('wishlist') }}">Wishlist</a>
           <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
         </nav>
     </div>

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% from "_macros.html" import item_fields, item_details %}
+
+{% block title %}My Wishlist{% endblock %}
+
+{% block content %}
+<div class="general-card">
+    <div class="header">
+        <div>
+            <h1>My Wishlist</h1>
+            <p>🔒 Only you can see this list. Copy items into a group when you want to share them.</p>
+        </div>
+    </div>
+
+    {% if items %}
+        {# The checkboxes join this form through their form="copy-form" attribute, because
+           each card also contains its own edit and delete forms and forms can't nest #}
+        <form id="copy-form" method="POST" action="{{ url_for('copy_wishlist_items') }}"></form>
+
+        <ul class="item-list">
+            {% for item in items %}
+                <li class="item-card" id="item-{{ item.id }}">
+                    <div class="item-row" id="view-{{ item.id }}">
+                        {% if groups %}
+                            <label class="item-select">
+                                <input type="checkbox" name="item_ids" value="{{ item.id }}" form="copy-form">
+                                {% call item_details(item) %}
+                                    {% if copied_to.get(item.id) %}
+                                        <p class="copied-to">✓ On your list for {{ copied_to[item.id]|join(', ') }}</p>
+                                    {% endif %}
+                                {% endcall %}
+                            </label>
+                        {% else %}
+                            {{ item_details(item) }}
+                        {% endif %}
+                        <div class="item-actions">
+                            <button type="button" class="btn-small btn-edit" onclick="toggleEdit('{{ item.id }}')">Edit</button>
+                            <form method="POST" action="{{ url_for('delete_wishlist_item', item_id=item.id) }}"
+                                  onsubmit="return confirm('Remove this item from your wishlist?')">
+                                <button type="submit" class="btn-small btn-delete-gift">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                    <form class="item-edit-form" id="edit-{{ item.id }}" method="POST" hidden
+                          action="{{ url_for('edit_wishlist_item', item_id=item.id) }}">
+                        {{ item_fields(item, 'edit-' ~ item.id ~ '-') }}
+                        <button type="submit" class="btn-primary">Save</button>
+                        <button type="button" class="btn-secondary" onclick="this.form.reset(); toggleEdit('{{ item.id }}')">Cancel</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+
+        {% if groups %}
+            <div class="copy-bar">
+                <label for="copy-group">Copy ticked items to</label>
+                <div class="copy-bar-controls">
+                    <select id="copy-group" name="group_id" form="copy-form">
+                        {% for group in groups %}
+                            <option value="{{ group.id }}">{{ group.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" form="copy-form" class="btn-primary">Copy</button>
+                </div>
+            </div>
+        {% else %}
+            <p class="text-muted">Join or create a group to share items from this list.</p>
+        {% endif %}
+    {% else %}
+        <p>Your wishlist is empty. Add things you'd like here, then copy them into any of your groups.</p>
+    {% endif %}
+
+    <div class="add-gift-section">
+        <button onclick="toggleGiftForm()" class="btn-add-gift" id="toggleButton">
+            Add to Wishlist
+        </button>
+
+        <div class="add-gift-form" id="giftForm" hidden>
+            <h3>Add to Your Wishlist</h3>
+            <form method="POST" action="{{ url_for('wishlist') }}">
+                {{ item_fields(id_prefix='new-') }}
+                <button type="submit" class="btn-primary">Add</button>
+                <button type="button" onclick="toggleGiftForm()" class="btn-secondary">Cancel</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

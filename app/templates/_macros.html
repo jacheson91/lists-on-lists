@@ -20,7 +20,8 @@
 </div>
 {% endmacro %}
 
-{# The name, description and link shown at the top of every item card #}
+{# The name, description and link shown at the top of every item card.
+   Use {% call item_details(item) %}...{% endcall %} to add extra lines underneath. #}
 {% macro item_details(item) %}
 <div class="item-body">
     <div class="item-name">{{ item.item_name }}</div>
@@ -30,5 +31,6 @@
     {% if item.link %}
         <a class="item-link" href="{{ item.link }}" target="_blank" rel="noopener">View item ↗</a>
     {% endif %}
+    {% if caller %}{{ caller() }}{% endif %}
 </div>
 {% endmacro %}

@@ -17,7 +17,7 @@ if not os.environ.get('FIRESTORE_EMULATOR_HOST'):
     sys.exit('FIRESTORE_EMULATOR_HOST is not set; refusing to seed (this would write to production).')
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
-from app.models import db, User, Group, GiftList  # noqa: E402
+from app.models import db, User, Group, GiftList, PrivateItem  # noqa: E402
 
 SEED_PASSWORD = 'password123'
 
@@ -46,7 +46,6 @@ def seed():
     family_items = [
         ('Alice', 'Wool scarf', 'Dark green or navy, nothing itchy', 'https://example.com/scarf', 'Ben'),
         ('Alice', 'The Thursday Murder Club', 'Paperback is fine', '', None),
-        ('Alice', 'Pottery class voucher', '', 'https://example.com/pottery', None),
         ('Ben', 'Bike lights', 'USB rechargeable, front and back', 'https://example.com/lights', 'Alice'),
         ('Ben', 'Hot sauce sampler', '', '', 'Erin'),
         ('Ben', 'Running socks', 'Size L', '', None),
@@ -62,6 +61,16 @@ def seed():
         if claimer:
             gift.claim(users[claimer].id)
         gifts[name] = gift
+
+    # Alice's private wishlist; one item has already been copied into the family group
+    wishlist = {name: PrivateItem.create(users['Alice'].id, name, description, link)
+                for name, description, link in [
+                    ('Pottery class voucher', '', 'https://example.com/pottery'),
+                    ('Noise-cancelling headphones', 'Over-ear, not earbuds', 'https://example.com/headphones'),
+                    ('Cast iron skillet', '10 inch', ''),
+                    ('Kindle gift card', '', ''),
+                ]}
+    wishlist['Pottery class voucher'].copy_to_group(family.id)
 
     # Ben changes something Alice already claimed, so Alice sees the "updated" notice
     gifts['Bike lights'].edit('Bike lights', 'USB-C rechargeable, front and back, 100+ lumens',

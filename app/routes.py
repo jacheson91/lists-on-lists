@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from app import app, login_manager
-from app.models import User, Group, GiftList, get_user_groups
+from app.models import User, Group, GiftList, PrivateItem, get_user_groups
 from app.utils import send_reset_email, get_serializer
 import random
 
@@ -311,7 +311,14 @@ def my_list(group_id):
         return redirect(url_for('my_list', group_id=group_id))
     
     gifts = GiftList.get_by_user(group_id, current_user.id)
-    return render_template('my_list.html', gifts=gifts, group=group)
+
+    # Private wishlist items that haven't been copied into this group yet
+    wishlist = PrivateItem.get_by_user(current_user.id)
+    already_copied = {gift.source_private_id for gift in gifts}
+    wishlist_to_add = [item for item in wishlist if item.id not in already_copied]
+
+    return render_template('my_list.html', gifts=gifts, group=group,
+                           has_wishlist=bool(wishlist), wishlist_to_add=wishlist_to_add)
 
 @app.route('/delete-item/<group_id>/<gift_id>', methods=['POST'])
 @login_required
@@ -393,3 +400,83 @@ def unclaim_item(group_id, gift_id):
     gift.unclaim()
     flash('Gift item unclaimed successfully!', 'success')
     return redirect(url_for('group_detail', group_id=group_id))
+@app.route('/wishlist', methods=['GET', 'POST'])
+@login_required
+def wishlist():
+    """The user's private wishlist, kept outside any group"""
+    if request.method == 'POST':
+        if not request.form['item_name'].strip():
+            flash('Item name is required.', 'danger')
+        else:
+            PrivateItem.create(current_user.id, request.form['item_name'],
+                               request.form.get('description', ''), request.form.get('link', ''))
+        return redirect(url_for('wishlist'))
+    
+    items = PrivateItem.get_by_user(current_user.id)
+    groups = get_user_groups(current_user.id)
+
+    # Names of the groups each wishlist item has already been copied into
+    copied_to = {}
+    for group in groups:
+        for gift in GiftList.get_by_user(group.id, current_user.id):
+            if gift.source_private_id:
+                copied_to.setdefault(gift.source_private_id, []).append(group.name)
+
+    return render_template('wishlist.html', items=items, groups=groups, copied_to=copied_to)
+
+@app.route('/wishlist/<item_id>/edit', methods=['POST'])
+@login_required
+def edit_wishlist_item(item_id):
+    item = PrivateItem.get(current_user.id, item_id)
+    if not item:
+        flash('Wishlist item not found', 'danger')
+    elif not request.form['item_name'].strip():
+        flash('Item name is required.', 'danger')
+    else:
+        item.update(request.form['item_name'], request.form.get('description', ''), request.form.get('link', ''))
+        flash('Wishlist item updated.', 'success')
+    return redirect(url_for('wishlist', _anchor=f'item-{item_id}'))
+
+@app.route('/wishlist/<item_id>/delete', methods=['POST'])
+@login_required
+def delete_wishlist_item(item_id):
+    item = PrivateItem.get(current_user.id, item_id)
+    if item:
+        item.delete()
+        flash('Removed from your wishlist.', 'success')
+    return redirect(url_for('wishlist'))
+
+@app.route('/wishlist/copy', methods=['POST'])
+@login_required
+def copy_wishlist_items():
+    """Copy selected private wishlist items into the user's list for a group"""
+    group = Group.get(request.form.get('group_id', ''))
+    if not group or not group.is_member(current_user.id):
+        flash('Choose one of your groups to copy into.', 'danger')
+        return redirect(url_for('wishlist'))
+    
+    item_ids = request.form.getlist('item_ids')
+    if not item_ids:
+        flash('Tick the items you want to copy first.', 'info')
+        if request.form.get('return_to') == 'my_list':
+            return redirect(url_for('my_list', group_id=group.id))
+        return redirect(url_for('wishlist'))
+    
+    # Skip anything already copied into this group
+    already_copied = {gift.source_private_id for gift in GiftList.get_by_user(group.id, current_user.id)}
+    copied = skipped = 0
+    for item_id in item_ids:
+        item = PrivateItem.get(current_user.id, item_id)
+        if not item:
+            continue
+        if item.id in already_copied:
+            skipped += 1
+        else:
+            item.copy_to_group(group.id)
+            copied += 1
+    
+    message = f'Added {copied} item{"s" if copied != 1 else ""} to your list for {group.name}.'
+    if skipped:
+        message += f' {skipped} {"was" if skipped == 1 else "were"} already there.'
+    flash(message, 'success')
+    return redirect(url_for('my_list', group_id=group.id))

@@ -47,7 +47,7 @@ Tests use their own emulator project and wipe it before each test, so they don't
 | Path | What's there |
 |---|---|
 | `app/routes.py` | Every page and form handler |
-| `app/models.py` | Thin classes over Firestore (`User`, `Group`, `GiftList`) |
+| `app/models.py` | Thin classes over Firestore (`User`, `Group`, `GiftList`, `PrivateItem`) |
 | `app/templates/` | Jinja templates; every page extends `base.html`, partials start with `_` |
 | `app/static/styles.css` | All styles, including the mobile layout |
 | `scripts/` | Local dev runner and seed data |
@@ -57,8 +57,15 @@ Tests use their own emulator project and wipe it before each test, so they don't
 
 ```
 users/{uid}               first_name, last_name, email, password_hash
+  private_items/{id}      item_name, description, link, created_at       (private wishlist, owner only)
 groups/{gid}              name, description, join_code, created_by, created_at, has_gift_exchange
   members/{uid}           joined_at
-  gift_lists/{id}         user_id, item_name, description, link, is_claimed, claimer_id
+  gift_lists/{id}         user_id, item_name, description, link, is_claimed, claimer_id, created_at,
+                          edited_since_claim, edit_changes, source_private_id
   gift_exchanges/{id}     giver_id, receiver_id, created_at
 ```
+
+- A group's `gift_lists` hold everyone's items for that group. List owners are never shown `is_claimed`, `claimer_id` or anything derived from them.
+- `edited_since_claim` / `edit_changes` tell the claimer what changed after they claimed. They're cleared when the claimer dismisses the notice, or on claim or unclaim.
+- Copying from the private wishlist creates an independent `gift_lists` item. `source_private_id` only records where it came from, so it isn't offered for copying again.
+- Older documents may lack the newer fields; the models default them.

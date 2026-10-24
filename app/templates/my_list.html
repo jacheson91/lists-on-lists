@@ -40,11 +40,39 @@
     {% endif %}
 
     <div class="add-gift-section">
+        {% if wishlist_to_add %}
+            <details class="wishlist-import">
+                <summary>Add from my wishlist ({{ wishlist_to_add|length }})</summary>
+                <form method="POST" action="{{ url_for('copy_wishlist_items') }}">
+                    <input type="hidden" name="group_id" value="{{ group.id }}">
+                    <input type="hidden" name="return_to" value="my_list">
+                    <ul class="pick-list">
+                        {% for item in wishlist_to_add %}
+                            <li>
+                                <label class="item-select">
+                                    <input type="checkbox" name="item_ids" value="{{ item.id }}">
+                                    <span>
+                                        <strong>{{ item.item_name }}</strong>
+                                        {% if item.description %}<span class="pick-description">{{ item.description }}</span>{% endif %}
+                                    </span>
+                                </label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <button type="submit" class="btn-primary">Add selected</button>
+                </form>
+            </details>
+        {% elif has_wishlist %}
+            <p class="text-muted">Everything on your <a href="{{ url_for('wishlist') }}">wishlist</a> is already on this list.</p>
+        {% else %}
+            <p class="hint">Tip: keep a private <a href="{{ url_for('wishlist') }}">wishlist</a> of ideas and copy them into any group.</p>
+        {% endif %}
+
         <button onclick="toggleGiftForm()" class="btn-add-gift" id="toggleButton">
             Add Gift
         </button>
 
-        <div class="add-gift-form" id="giftForm" style="display: none;">
+        <div class="add-gift-form" id="giftForm" hidden>
             <h3>Add a New Gift</h3>
             <form method="POST" action="{{ url_for('my_list', group_id=group.id) }}">
                 {{ item_fields(id_prefix='new-') }}
@@ -53,29 +81,5 @@
             </form>
         </div>
     </div>
-
-    <script>
-    function toggleGiftForm() {
-        const form = document.getElementById('giftForm');
-        const button = document.getElementById('toggleButton');
-
-        if (form.style.display === 'none') {
-            form.style.display = 'block';
-            button.style.display = 'none';
-        } else {
-            form.style.display = 'none';
-            button.style.display = 'block';
-        }
-    }
-
-    // Swap an item between its normal view and its edit form
-    function toggleEdit(giftId) {
-        for (const id of ['view-' + giftId, 'edit-' + giftId]) {
-            const el = document.getElementById(id);
-            el.hidden = !el.hidden;
-        }
-    }
-    </script>
-
 </div>
 {% endblock %}
