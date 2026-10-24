@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import item_fields, item_details, likes_box %}
+{% from "_macros.html" import item_fields, item_details, likes_box, thread %}
 
 {% block title %}My Gifts{% endblock %}
 
@@ -40,6 +40,8 @@
                         <button type="submit" class="btn-primary">Save</button>
                         <button type="button" class="btn-secondary" onclick="this.form.reset(); toggleEdit('{{ gift.id }}')">Cancel</button>
                     </form>
+                    {{ thread(gift, threads[gift.id], current_user.id, current_user.first_name,
+                              owner_view=True, open=(open_thread == gift.id)) }}
                 </li>
             {% endfor %}
         </ul>

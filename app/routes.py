@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from app import app, login_manager
-from app.models import User, Group, GiftList, PrivateItem, get_user_groups
+from app.models import User, Group, GiftList, PrivateItem, Message, get_user_groups
 from app.utils import send_reset_email, get_serializer
 import random
 
@@ -230,13 +230,20 @@ def group_detail(group_id):
                 'gifts': gifts,
                 'claimed_by_me': claimed_by_me
             })
-    
-    return render_template('group_detail.html', 
-                         group=group, 
+
+    # Message threads on everyone else's items, filtered to what this user may see
+    all_gifts = [gift for entry in member_gifts for gift in entry['gifts']]
+    threads = Message.threads_for(group.id, current_user.id, all_gifts)
+
+    return render_template('group_detail.html',
+                         group=group,
                          member_gifts=member_gifts,
                          is_creator=is_creator,
                          member_count=len(members),
-                         gift_exchange_assignment=gift_exchange_assignment)
+                         gift_exchange_assignment=gift_exchange_assignment,
+                         threads=threads,
+                         names={member.id: member.first_name for member in members},
+                         open_thread=request.args.get('thread'))
 
 @app.route('/group/<group_id>/start-gift-exchange', methods=['POST'])
 @login_required
@@ -317,8 +324,12 @@ def my_list(group_id):
     already_copied = {gift.source_private_id for gift in gifts}
     wishlist_to_add = [item for item in wishlist if item.id not in already_copied]
 
+    # The owner's view of their items' threads: anonymous messages and replies, never comments
+    threads = Message.threads_for(group_id, current_user.id, gifts)
+
     return render_template('my_list.html', gifts=gifts, group=group,
-                           has_wishlist=bool(wishlist), wishlist_to_add=wishlist_to_add)
+                           has_wishlist=bool(wishlist), wishlist_to_add=wishlist_to_add,
+                           threads=threads, open_thread=request.args.get('thread'))
 
 @app.route('/delete-item/<group_id>/<gift_id>', methods=['POST'])
 @login_required
@@ -493,3 +504,52 @@ def update_likes():
     if not next_url.startswith('/') or next_url.startswith('//'):
         next_url = url_for('wishlist')
     return redirect(next_url)
+
+@app.route('/message/<group_id>/<gift_id>', methods=['POST'])
+@login_required
+def post_message(group_id, gift_id):
+    group = Group.get(group_id)
+    gift = GiftList.get(group_id, gift_id)
+    if not group or not gift or not group.is_member(current_user.id):
+        flash('Gift item not found', 'danger')
+        return redirect(url_for('dashboard'))
+    
+    # Owners can only reply on their own items; everyone else picks hidden or anonymous
+    is_owner = gift.user_id == current_user.id
+    kind = 'reply' if is_owner else request.form.get('kind')
+    text = request.form.get('text', '').strip()
+    
+    if not text:
+        flash('Write a message first.', 'info')
+    elif not is_owner and kind not in Message.MEMBER_KINDS:
+        flash('Choose who can see your message.', 'danger')
+    else:
+        Message.create(group_id, gift_id, current_user.id, kind, text)
+    
+    return redirect(thread_url(gift, is_owner))
+
+@app.route('/delete-message/<group_id>/<message_id>', methods=['POST'])
+@login_required
+def delete_message(group_id, message_id):
+    message = Message.get(group_id, message_id)
+    if not message or message.author_id != current_user.id:
+        flash('Message not found', 'danger')
+        return redirect(url_for('dashboard'))
+    
+    message.delete()
+    gift = GiftList.get(group_id, message.item_id)
+    if not gift:
+        return redirect(url_for('group_detail', group_id=group_id))
+    return redirect(thread_url(gift, gift.user_id == current_user.id))
+
+def thread_url(gift, is_owner):
+    """Back to the page showing this item's thread, scrolled to it and opened"""
+    page = 'my_list' if is_owner else 'group_detail'
+    return url_for(page, group_id=gift.group_id, thread=gift.id, _anchor=f'item-{gift.id}')
+
+@app.template_filter('short_date')
+def short_date(value):
+    """e.g. '3 Nov'. Server timestamps are only filled in after a write, so tolerate missing ones."""
+    if not hasattr(value, 'strftime'):
+        return ''
+    return f'{value.day} {value.strftime("%b")}'

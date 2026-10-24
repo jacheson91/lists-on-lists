@@ -48,3 +48,68 @@
 </div>
 {% endif %}
 {% endmacro %}
+
+{# An item's message thread. The messages passed in must already be filtered with
+   Message.visible_to for this viewer; this macro only decides how to label them.
+   On the owner's own list (owner_view) only signed replies can be posted. #}
+{% macro thread(gift, messages, viewer_id, owner_name, names={}, owner_view=False, open=False) %}
+<details class="thread" {% if open %}open{% endif %}>
+    <summary>
+        💬
+        {% if messages %}
+            {{ messages|length }} message{{ 's' if messages|length != 1 }}
+        {% else %}
+            {{ 'Add a note' if owner_view else 'Ask or comment' }}
+        {% endif %}
+    </summary>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="message message-{{ message.kind }}">
+                    <div class="message-meta">
+                        {% if message.kind == 'anonymous' %}
+                            <strong>Anonymous{% if message.author_id == viewer_id %} (you){% endif %}</strong>
+                        {% elif message.author_id == viewer_id %}
+                            <strong>You</strong>
+                        {% else %}
+                            <strong>{{ names.get(message.author_id, 'Someone') }}</strong>
+                        {% endif %}
+                        {% if message.kind == 'comment' %}
+                            <span class="message-tag">🙈 hidden from {{ owner_name }}</span>
+                        {% elif message.kind == 'reply' %}
+                            <span class="message-tag">list owner</span>
+                        {% endif %}
+                        <span class="message-date">{{ message.created_at|short_date }}</span>
+                    </div>
+                    <p class="message-text">{{ message.text }}</p>
+                    {% if message.author_id == viewer_id %}
+                        <form method="POST" onsubmit="return confirm('Delete this message?')"
+                              action="{{ url_for('delete_message', group_id=gift.group_id, message_id=message.id) }}">
+                            <button type="submit" class="message-delete">Delete</button>
+                        </form>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <form class="message-form" method="POST" action="{{ url_for('post_message', group_id=gift.group_id, gift_id=gift.id) }}">
+        <textarea name="text" rows="2" maxlength="1000" required aria-label="Message"
+                  placeholder="{{ 'Answer a question or add a note…' if owner_view else 'Write a message…' }}"></textarea>
+        {% if owner_view %}
+            <p class="hint">Your replies are signed and everyone in the group can see them.</p>
+        {% else %}
+            <div class="message-kind">
+                <label>
+                    <input type="radio" name="kind" value="comment" checked>
+                    <span>🙈 <strong>Hidden from {{ owner_name }}</strong> · signed with your name</span>
+                </label>
+                <label>
+                    <input type="radio" name="kind" value="anonymous">
+                    <span>🎭 <strong>Anonymous</strong> · {{ owner_name }} can see it, but not who wrote it</span>
+                </label>
+            </div>
+        {% endif %}
+        <button type="submit" class="btn-small btn-send">{{ 'Reply' if owner_view else 'Send' }}</button>
+    </form>
+</details>
+{% endmacro %}

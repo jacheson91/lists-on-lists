@@ -17,7 +17,7 @@ if not os.environ.get('FIRESTORE_EMULATOR_HOST'):
     sys.exit('FIRESTORE_EMULATOR_HOST is not set; refusing to seed (this would write to production).')
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
-from app.models import db, User, Group, GiftList, PrivateItem  # noqa: E402
+from app.models import db, User, Group, GiftList, PrivateItem, Message  # noqa: E402
 
 SEED_PASSWORD = 'password123'
 
@@ -81,6 +81,20 @@ def seed():
     # Ben changes something Alice already claimed, so Alice sees the "updated" notice
     gifts['Bike lights'].edit('Bike lights', 'USB-C rechargeable, front and back, 100+ lumens',
                               'https://example.com/brighter-lights')
+
+    # Message threads showing all three kinds. Logged in as Alice you'll see her anonymous
+    # question to Ben and the comments on Carol's puzzle, plus Erin's anonymous question and
+    # your reply on the scarf, but never Ben and Carol's comments about going halves on it.
+    for item, author, kind, text in [
+        ('Wool scarf', 'Ben', 'comment', "I've claimed this. Carol, want to go halves?"),
+        ('Wool scarf', 'Carol', 'comment', "Yes! I'll send you £15"),
+        ('Wool scarf', 'Erin', 'anonymous', 'Do you prefer long or short scarves?'),
+        ('Wool scarf', 'Alice', 'reply', 'Long please, the longer the better!'),
+        ('Running socks', 'Alice', 'anonymous', 'Any brand you like best?'),
+        ('Running socks', 'Ben', 'reply', 'Anything cushioned, thanks!'),
+        ('Jigsaw puzzle', 'Dan', 'comment', 'There was a great Lake District one at the market'),
+    ]:
+        Message.create(family.id, gifts[item].id, users[author].id, kind, text)
 
     cousins = Group.create('Cousins Secret Santa', '£20 limit', users['Carol'].id)
     for name in ['Dan', 'Erin', 'Alice']:

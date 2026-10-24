@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import item_details, likes_box %}
+{% from "_macros.html" import item_details, likes_box, thread %}
 
 {# Shown to the claimer when the owner has changed an item since it was claimed #}
 {% macro edit_alert(gift) %}
@@ -104,6 +104,8 @@
                                 {% if gift.claimer_id == current_user.id and gift.edited_since_claim %}
                                     {{ edit_alert(gift) }}
                                 {% endif %}
+                                {{ thread(gift, threads[gift.id], current_user.id, member.user.first_name,
+                                          names=names, open=(open_thread == gift.id)) }}
                             </li>
                         {% endfor %}
                     </ul>

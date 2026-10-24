@@ -47,7 +47,7 @@ Tests use their own emulator project and wipe it before each test, so they don't
 | Path | What's there |
 |---|---|
 | `app/routes.py` | Every page and form handler |
-| `app/models.py` | Thin classes over Firestore (`User`, `Group`, `GiftList`, `PrivateItem`) |
+| `app/models.py` | Thin classes over Firestore (`User`, `Group`, `GiftList`, `PrivateItem`, `Message`) |
 | `app/templates/` | Jinja templates; every page extends `base.html`, partials start with `_` |
 | `app/static/styles.css` | All styles, including the mobile layout |
 | `scripts/` | Local dev runner and seed data |
@@ -63,7 +63,14 @@ groups/{gid}              name, description, join_code, created_by, created_at, 
   gift_lists/{id}         user_id, item_name, description, link, is_claimed, claimer_id, created_at,
                           edited_since_claim, edit_changes, source_private_id
   gift_exchanges/{id}     giver_id, receiver_id, created_at
+  messages/{id}           item_id, author_id, kind, text, created_at       (threads on gift items)
 ```
+
+- A message's `kind` decides who sees it, enforced in one place (`Message.visible_to`):
+  - `comment`: from another member, hidden from the item's owner, signed.
+  - `anonymous`: from another member, seen by everyone including the owner, never signed.
+  - `reply`: from the item's owner, seen by everyone, signed.
+- Messages are stored per group rather than per item, so a page loads all its threads in one query. Deleting an item deletes its messages.
 
 - A group's `gift_lists` hold everyone's items for that group. List owners are never shown `is_claimed`, `claimer_id` or anything derived from them.
 - `edited_since_claim` / `edit_changes` tell the claimer what changed after they claimed. They're cleared when the claimer dismisses the notice, or on claim or unclaim.

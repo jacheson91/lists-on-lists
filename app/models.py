@@ -1,6 +1,7 @@
 from google.cloud import firestore
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from datetime import datetime, timezone
 import os
 import secrets
 
@@ -216,7 +217,7 @@ class GiftList:
             'edited_since_claim': False,
             'edit_changes': [],
             'source_private_id': source_private_id,
-            'created_at': firestore.SERVER_TIMESTAMP
+            'created_at': now()
         }
         gift_ref.set(gift_data)
         return GiftList(gift_ref.id, group_id, gift_data)
@@ -254,7 +255,8 @@ class GiftList:
             setattr(self, key, value)
     
     def delete(self):
-        """Delete gift item"""
+        """Delete gift item and its messages"""
+        Message.delete_for_item(self.group_id, self.id)
         db.collection('groups').document(self.group_id).collection('gift_lists').document(self.id).delete()
     
     def claim(self, claimer_id):
@@ -314,7 +316,7 @@ class PrivateItem:
             'item_name': clean_text(item_name),
             'description': clean_text(description),
             'link': clean_text(link),
-            'created_at': firestore.SERVER_TIMESTAMP
+            'created_at': now()
         }
         item_ref.set(item_data)
         return PrivateItem(item_ref.id, user_id, item_data)
@@ -350,6 +352,87 @@ class PrivateItem:
         """Add a copy of this item to the owner's list in a group"""
         return GiftList.create(group_id, self.user_id, self.item_name, self.description, self.link,
                                source_private_id=self.id)
+
+
+class Message:
+    """A message on a gift item. Its kind decides who can see it:
+
+    'comment'    from another member: hidden from the item's owner, signed
+    'anonymous'  from another member: everyone sees it, including the owner, unsigned
+    'reply'      from the item's owner: everyone sees it, signed
+
+    Messages live per group (not per item) so a page can load all its threads in one query.
+    """
+    MEMBER_KINDS = ('comment', 'anonymous')
+    MAX_LENGTH = 1000
+
+    def __init__(self, message_id, group_id, data=None):
+        self.id = message_id
+        self.group_id = group_id
+        if data:
+            self.item_id = data.get('item_id', '')
+            self.author_id = data.get('author_id', '')
+            self.kind = data.get('kind', 'comment')
+            self.text = data.get('text', '')
+            self.created_at = data.get('created_at')
+
+    @staticmethod
+    def _collection(group_id):
+        return db.collection('groups').document(group_id).collection('messages')
+
+    @staticmethod
+    def create(group_id, item_id, author_id, kind, text):
+        """Post a message on an item"""
+        message_ref = Message._collection(group_id).document()
+        message_data = {
+            'item_id': item_id,
+            'author_id': author_id,
+            'kind': kind,
+            'text': clean_text(text)[:Message.MAX_LENGTH],
+            'created_at': now()
+        }
+        message_ref.set(message_data)
+        return Message(message_ref.id, group_id, message_data)
+
+    @staticmethod
+    def get(group_id, message_id):
+        doc = Message._collection(group_id).document(message_id).get()
+        if doc.exists:
+            return Message(doc.id, group_id, doc.to_dict())
+        return None
+
+    @staticmethod
+    def threads_for(group_id, viewer_id, gifts):
+        """{gift id: [messages]} for the given gifts, keeping only what viewer_id may see, oldest first"""
+        owners = {gift.id: gift.user_id for gift in gifts}
+        threads = {gift_id: [] for gift_id in owners}
+        docs = Message._collection(group_id).order_by('created_at').stream()
+        for doc in docs:
+            message = Message(doc.id, group_id, doc.to_dict())
+            if message.item_id in owners and message.visible_to(viewer_id, owners[message.item_id]):
+                threads[message.item_id].append(message)
+        return threads
+
+    @staticmethod
+    def delete_for_item(group_id, item_id):
+        """Remove every message on an item (when the item is deleted)"""
+        docs = Message._collection(group_id).where('item_id', '==', item_id).stream()
+        for doc in docs:
+            doc.reference.delete()
+
+    def visible_to(self, viewer_id, item_owner_id):
+        """The one rule that keeps comments secret from the list owner"""
+        return self.kind != 'comment' or viewer_id != item_owner_id
+
+    def delete(self):
+        Message._collection(self.group_id).document(self.id).delete()
+
+
+def now():
+    """Timestamp for created_at fields that lists are sorted by. Uses the app's clock rather than
+    SERVER_TIMESTAMP: it's microsecond-precise (the emulator's server time is only milliseconds,
+    so quick successive writes tie) and the returned object gets a real date straight away."""
+    return datetime.now(timezone.utc)
 
 
 def clean_text(text):
