@@ -48,7 +48,7 @@ Tests use their own emulator project and wipe it before each test, so they don't
 |---|---|
 | `app/routes.py` | Every page and form handler |
 | `app/models.py` | Thin classes over Firestore (`User`, `Group`, `GiftList`) |
-| `app/templates/` | Jinja templates |
+| `app/templates/` | Jinja templates; every page extends `base.html`, partials start with `_` |
 | `app/static/styles.css` | All styles, including the mobile layout |
 | `scripts/` | Local dev runner and seed data |
 | `tests/` | pytest suite (runs against the emulator) |

@@ -42,7 +42,7 @@
     {% else %}
         {% for member in member_gifts %}
             <div class="member-section">
-                <h3>{{ member.user.first_name }}'s List
+                <h3 class="member-heading">{{ member.user.first_name }}'s List
                     {% if member.claimed_by_me > 0 %}
                         <span class="badge-success">{{ member.claimed_by_me }} claimed by you</span>
                     {% endif %}
@@ -50,56 +50,40 @@
                         <span class="badge-exchange">Your Gift Exchange Match! 🎁</span>
                     {% endif %}
                 </h3>
-                
+
                 {% if member.gifts|length == 0 %}
                     <p class="text-muted">No gifts added yet</p>
                 {% else %}
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Item Name</th>
-                                <th>Description</th>
-                                <th>Link</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for gift in member.gifts %}
-                                <tr>
-                                    <td>{{ gift.item_name }}</td>
-                                    <td>{{ gift.description or "No description" }}</td>
-                                    <td>
-                                        {% if gift.link %}
-                                            <a href="{{ gift.link }}" target="_blank">View</a>
-                                        {% else %}
-                                            N/A
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if gift.claimer_id == current_user.id %}
-                                            <span class="badge-success">Claimed by you</span>
-                                        {% elif gift.is_claimed %}
-                                            <span class="badge-claimed">Claimed</span>
-                                        {% else %}
-                                            <span class="badge-available">Available</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if gift.claimer_id == current_user.id %}
-                                            <form method="POST" action="{{ url_for('unclaim_item', group_id=group.id, gift_id=gift.id) }}" style="display:inline;">
-                                                <button type="submit" class="btn-small btn-unclaim">Unclaim</button>
-                                            </form>
-                                        {% elif not gift.is_claimed %}
-                                            <form method="POST" action="{{ url_for('claim_item', group_id=group.id, gift_id=gift.id) }}" style="display:inline;">
-                                                <button type="submit" class="btn-small btn-claim">Claim</button>
-                                            </form>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                    <ul class="item-list">
+                        {% for gift in member.gifts %}
+                            <li class="item-card" id="item-{{ gift.id }}">
+                                <div class="item-body">
+                                    <div class="item-name">{{ gift.item_name }}</div>
+                                    {% if gift.description %}
+                                        <p class="item-description">{{ gift.description }}</p>
+                                    {% endif %}
+                                    {% if gift.link %}
+                                        <a class="item-link" href="{{ gift.link }}" target="_blank" rel="noopener">View item ↗</a>
+                                    {% endif %}
+                                </div>
+                                <div class="item-actions">
+                                    {% if gift.claimer_id == current_user.id %}
+                                        <span class="badge-success">Claimed by you</span>
+                                        <form method="POST" action="{{ url_for('unclaim_item', group_id=group.id, gift_id=gift.id) }}">
+                                            <button type="submit" class="btn-small btn-unclaim">Unclaim</button>
+                                        </form>
+                                    {% elif gift.is_claimed %}
+                                        <span class="badge-claimed">Claimed</span>
+                                    {% else %}
+                                        <span class="badge-available">Available</span>
+                                        <form method="POST" action="{{ url_for('claim_item', group_id=group.id, gift_id=gift.id) }}">
+                                            <button type="submit" class="btn-small btn-claim">Claim</button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
                 {% endif %}
             </div>
         {% endfor %}

@@ -1,4 +1,13 @@
+import pytest
+
+from app import app as flask_app
 from app.models import GiftList
+
+
+@pytest.mark.parametrize('path', ['/login', '/register', '/forgot-password'])
+def test_logged_out_pages_are_mobile_friendly(path):
+    page = flask_app.test_client().get(path).get_data(as_text=True)
+    assert 'name="viewport"' in page
 
 
 def test_dashboard_lists_my_groups(family, login):

@@ -51,7 +51,7 @@ a:hover {
     flex-wrap: wrap;
 }
 
-.toolbar-brand {
+.toolbar a.toolbar-brand {
     font-size: 22px;
     font-weight: 700;
     color: white;
@@ -60,10 +60,17 @@ a:hover {
     display: flex;
     align-items: center;
     gap: 8px;
+    padding: 0;
+    background: none;
 }
 
-.toolbar-brand p {
-    margin: 8px 0px 0px 0px;
+.toolbar a.toolbar-brand:hover {
+    background: none;
+}
+
+.toolbar-brand img {
+    width: 40px;
+    height: 40px;
 }
 
 .toolbar-nav {
@@ -253,6 +260,10 @@ a:hover {
     word-break: break-all;
 }
 
+.group-info p {
+    margin: 0;
+}
+
 .group-info code {
     background: white;
     padding: 4px 8px;
@@ -405,13 +416,14 @@ a:hover {
   font-weight: 500;
 }
 
-.form-group input {
+/* Inputs stay at 16px+ so iPhones don't zoom in when they're focused */
+.form-group input, .form-group select {
   width: 100%;
   padding: 12px;
   margin-bottom: 12px;
   border: 2px solid #e1e1e1;
   border-radius: 6px;
-  font-size: 14px;
+  font-size: 16px;
   transition: border-color 0.3s;
   box-sizing: border-box;
   font-family: Nunito, sans-serif;
@@ -472,7 +484,7 @@ a:hover {
     padding: 12px;
     border: 2px solid #e1e1e1;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 16px;
     font-family: inherit;
     transition: border-color 0.3s;
     box-sizing: border-box;
@@ -486,8 +498,9 @@ a:hover {
 
 .btn-primary {
   padding: 12px 20px;
-  background: #83dbe4;
+  background: #00a3a3;
   color: white;
+  font-weight: 600;
   border: none;
   border-radius: 6px;
   white-space: nowrap;
@@ -507,7 +520,7 @@ a:hover {
 .btn-secondary {
   padding: 12px 20px;
   background: #ffd136;
-  color: white;
+  color: #333;
   border: none;
   border-radius: 6px;
   font-size: 16px;
@@ -521,7 +534,7 @@ a:hover {
 }
 
 .btn-secondary:hover {
-  color: white;
+  color: #333;
   transform: translateY(-2px);
   box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
 }
@@ -581,38 +594,68 @@ button:disabled {
     cursor: not-allowed;
 }
 
-/* Tables */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
+/* Gift item cards (used instead of tables so lists work on phones) */
+.item-list {
+    list-style: none;
+    margin: 15px 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.item-card {
     background: white;
-    overflow-x: auto;
-    display: block;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
 }
 
-table thead {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
+.item-body {
+    flex: 1;
+    min-width: 0;
 }
 
-table tbody {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
+.item-name {
+    font-weight: 700;
+    font-size: 17px;
+    overflow-wrap: anywhere;
 }
 
-table th, table td {
-    padding: 12px;
-    border: 1px solid #ddd;
-    text-align: left;
-    word-wrap: break-word;
+.item-description {
+    margin: 4px 0 0;
+    color: #555;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
 }
 
-table th {
-    background: #f8f9fa;
+.item-link {
+    display: inline-block;
+    margin-top: 6px;
     font-weight: 600;
+}
+
+.item-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.item-actions form {
+    margin: 0;
+}
+
+.member-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0;
 }
 
 /* Claimed Gifts */
@@ -745,7 +788,7 @@ table th {
 
 .badge-exchange {
     background: #ffd136;
-    color: white;
+    color: #333;
     padding: 6px 14px;
     border-radius: 12px;
     font-size: 13px;
@@ -753,171 +796,147 @@ table th {
     margin-left: 10px;
 }
 
+
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
+    /* One compact toolbar row: icon-only brand, small nav buttons */
     .toolbar {
-        padding: 12px 15px;
+        padding: 8px 12px;
+        flex-wrap: nowrap;
     }
-    
-    .toolbar-brand {
-        font-size: 22px;  /* Adjusted for mobile */
+
+    .toolbar-brand span {
+        display: none;
     }
-    
+
+    .toolbar-brand img {
+        width: 34px;
+        height: 34px;
+    }
+
     .toolbar-nav {
-        justify-content: center;
-        margin-top: 10px;
+        flex-wrap: nowrap;
+        gap: 6px;
     }
-    
+
     .toolbar a {
-        padding: 8px 14px;  /* Adjusted for mobile */
-        font-size: 15px;  /* Adjusted for mobile */
+        padding: 7px 12px;
+        font-size: 15px;
     }
-    
+
+    .flash-container {
+        margin: 10px auto;
+        padding: 0 10px;
+    }
+
     .content {
         background-size: 200px 200px;
         padding: 10px;
     }
-    
-    .general-card {
-        padding: 15px;
-        border-width: 4px;
-        margin-top: 10px;
-    }
-    
-    .general-card h1 {
-        font-size: 20px;
-    }
-    
+
+    .general-card,
     .dashboard-container {
         padding: 15px;
         border-width: 4px;
-        margin-top: 10px;
-        min-width: auto;
+        margin-top: 0;
     }
-    
+
+    .general-card h1,
+    .header h1 {
+        font-size: 20px;
+    }
+
     .header {
         flex-direction: column;
         align-items: stretch;
     }
-    
-    .header h1 {
-        font-size: 20px;
-    }
-    
-    .header-actions {
+
+    /* Page-level buttons sit side by side instead of stacking full-width */
+    .header-actions,
+    .header .group-actions {
         width: 100%;
-        flex-direction: column;
+        flex-direction: row;
     }
-    
-    .header-actions a,
-    .header-actions .btn-primary,
-    .header-actions .btn-secondary {
-        width: 100%;
-        text-align: center;
+
+    .header-actions > a,
+    .header .group-actions > a {
+        flex: 1;
+        margin: 0;
+        padding: 10px 12px;
+        white-space: normal;
     }
-    
+
     .groups-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .group-card {
         padding: 15px;
     }
-    
+
+    .group-card h3 {
+        font-size: 18px;
+    }
+
     .group-stats {
         gap: 15px;
+        margin: 15px 0;
+        padding: 10px;
     }
-    
+
     .stat-number {
         font-size: 20px;
-    }
-    
-    .group-actions {
-        flex-direction: column;
-    }
-    
-    .btn-view, .btn-list {
-        width: 100%;
     }
 
     .btn-add-gift {
         width: 100%;
     }
-    
-    .group-header {
-        flex-direction: column;
-    }
-    
-    .group-header .group-actions {
-        width: 100%;
-    }
-    
+
     .auth-card {
         padding: 20px;
         max-width: 100%;
     }
-    
+
     .auth-card h1, .auth-card h2 {
         font-size: 20px;
     }
-    
+
     .btn-primary, .btn-secondary {
         width: 100%;
         margin-left: 0;
         margin-top: 10px;
     }
-    
+
     .add-gift-form {
         padding: 15px;
     }
-    
-    table {
-        font-size: 14px;
-    }
-    
-    table th, table td {
-        padding: 8px;
-    }
-    
-    /* Make table scrollable on mobile */
-    .general-card {
-        overflow-x: auto;
-    }
-    
-    table {
-        min-width: 600px;
-    }
-    
-    .general-card h1 {
-        font-size: 18px;
-    }
-    
-    .header h1 {
-        font-size: 18px;
-    }
-    
-    .group-card h3 {
-        font-size: 18px;
-    }
-    
-    table {
-        font-size: 12px;
-    }
-    
-    table th, table td {
-        padding: 6px;
-    }
-}
 
-@media (max-width: 768px) {
+    /* Item cards stack: details on top, status and buttons in a row underneath */
+    .item-card {
+        flex-direction: column;
+        padding: 12px 14px;
+    }
+
+    .item-actions {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .item-actions .btn-small {
+        padding: 9px 18px;
+        font-size: 15px;
+    }
+
     .gift-exchange-banner h2 {
         font-size: 22px;
     }
-    
+
     .exchange-assignment {
         font-size: 18px;
     }
-    
+
     .exchange-assignment strong {
         font-size: 20px;
     }

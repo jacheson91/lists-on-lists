@@ -1,33 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <title>Register</title>
-    <link rel="icon" type="image/x-icon" href="/favicon.png">
-</head>
-<body>
-    <div class="content">
-        <div class="auth-card">
-            <h1>Register</h1>
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        {{ message }}
-                    </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-            <form class="form-group" method="POST">
-                <input type="text" name="first_name" placeholder="First Name" required><br>
-                <input type="text" name="last_name" placeholder="Last Name" required><br>
-                <input type="email" name="email" placeholder="Email" required><br>
-                <input type="password" name="password" placeholder="Password" required minlength="6"><br>
-                <button type="submit" class="btn-primary">Register</button>
-            </form>
-            <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a>.</p>
-        </div>
-    </div>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block flashes %}{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+    <h1>Register</h1>
+    {% include '_flashes.html' %}
+    <form class="form-group" method="POST">
+        <input type="text" name="first_name" placeholder="First Name" autocomplete="given-name" required>
+        <input type="text" name="last_name" placeholder="Last Name" autocomplete="family-name" required>
+        <input type="email" name="email" placeholder="Email" autocomplete="email" required>
+        <input type="password" name="password" placeholder="Password" autocomplete="new-password" required minlength="6">
+        <button type="submit" class="btn-primary">Register</button>
+    </form>
+    <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a>.</p>
+</div>
+{% endblock %}

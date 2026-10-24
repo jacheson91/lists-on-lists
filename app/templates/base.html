@@ -3,35 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Gift Registry{% endblock %}</title>
+    <title>{% block title %}Giftster{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="icon" type="image/x-icon" href="/static/favicon.png">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
 </head>
 <body>
+    {% if current_user.is_authenticated %}
     <div class="toolbar">
         <a href="{{ url_for('dashboard') }}" class="toolbar-brand">
-          <div class="toolbar-brand">
-            <img src="/static/favicon.png">
-            <p>Giftster</p>
-          </div>
+            <img src="{{ url_for('static', filename='favicon.png') }}" alt="">
+            <span>Giftster</span>
         </a>
         <nav class="toolbar-nav">
           <a href="{{ url_for('dashboard') }}">Dashboard</a>
           <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
         </nav>
     </div>
-    <div class="flash-container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category }}">
-                {{ message }}
-                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
-              </div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-    </div>
+    {% endif %}
+    {# Auth pages override this to show messages inside their card #}
+    {% block flashes %}
+      {% if get_flashed_messages() %}
+        <div class="flash-container">{% include '_flashes.html' %}</div>
+      {% endif %}
+    {% endblock %}
     <div class="content">
         {% block content %}{% endblock %}
     </div>

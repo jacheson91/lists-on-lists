@@ -12,36 +12,27 @@
         </div>
     </div>
     {% if gifts|length > 0 %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Item Name</th>
-                    <th>Description</th>
-                    <th>Link</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for gift in gifts %}
-                    <tr>
-                        <td>{{ gift.item_name }}</td>
-                        <td>{{ gift.description or "No description provided" }}</td>
-                        <td>
-                            {% if gift.link %}
-                                <a href="{{ gift.link }}" target="_blank">View Item</a>
-                            {% else %}
-                                N/A
-                            {% endif %}
-                        </td>
-                        <td>
-                            <form method="POST" action="{{ url_for('delete_item', group_id=group.id, gift_id=gift.id) }}" style="display: inline;">
-                                <button type="submit" class="btn-delete-gift">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <ul class="item-list">
+            {% for gift in gifts %}
+                <li class="item-card" id="item-{{ gift.id }}">
+                    <div class="item-body">
+                        <div class="item-name">{{ gift.item_name }}</div>
+                        {% if gift.description %}
+                            <p class="item-description">{{ gift.description }}</p>
+                        {% endif %}
+                        {% if gift.link %}
+                            <a class="item-link" href="{{ gift.link }}" target="_blank" rel="noopener">View item ↗</a>
+                        {% endif %}
+                    </div>
+                    <div class="item-actions">
+                        <form method="POST" action="{{ url_for('delete_item', group_id=group.id, gift_id=gift.id) }}"
+                              onsubmit="return confirm('Delete this item from your list?')">
+                            <button type="submit" class="btn-small btn-delete-gift">Delete</button>
+                        </form>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
     {% else %}
         <p>You haven't added any gifts yet!</p>
     {% endif %}
