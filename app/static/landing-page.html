@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giftster: gift giving made easy</title>
+    <link rel="icon" type="image/png" href="https://app.giftster.app/static/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
+    <style>
+        :root {
+            --bg: #f3f8f7;
+            --surface: #ffffff;
+            --line: #dde8e6;
+            --line-strong: #c4d5d2;
+            --ink: #172625;
+            --muted: #566866;
+            --teal: #087a77;
+            --teal-dark: #05605e;
+            --teal-tint: #e0f3f1;
+            /* Hero panel behind the present. Alternatives to try:
+               soft lavender #e9e0f7, pale teal #d7efec */
+            --panel: #d7efec;
+            --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+            --font-display: "Bricolage Grotesque", "Figtree", system-ui, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-body);
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--ink);
+            background: var(--bg);
+        }
+
+        a { color: var(--teal); text-decoration: none; }
+
+        :focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+
+        /* ---------- Toolbar ---------- */
+        .toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            min-height: 64px;
+            padding: 0 24px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .toolbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--teal-dark);
+        }
+
+        .toolbar-logo img { width: 36px; height: 36px; }
+
+        .toolbar-buttons { display: flex; gap: 8px; }
+
+        /* ---------- Buttons ---------- */
+        .btn-primary,
+        .btn-secondary {
+            display: inline-block;
+            padding: 10px 18px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.4;
+            text-align: center;
+            white-space: nowrap;
+            transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+        }
+
+        .btn-primary { background: var(--teal); color: #fff; }
+        .btn-primary:hover { background: var(--teal-dark); color: #fff; }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--ink);
+            border-color: var(--line-strong);
+        }
+        .btn-secondary:hover {
+            background: var(--teal-tint);
+            border-color: var(--teal);
+            color: var(--teal-dark);
+        }
+
+        .btn-large { padding: 14px 26px; font-size: 17px; }
+
+        /* ---------- Hero ---------- */
+        .page {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            align-items: center;
+            gap: 56px;
+            padding: 72px 0 80px;
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 700;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+        }
+
+        .hero-sub {
+            max-width: 30em;
+            margin-top: 24px;
+            font-size: 1.2rem;
+            color: var(--muted);
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        /* The one bold moment: the present on a deep plum panel */
+        .gift-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 420px;
+            padding: 40px;
+            background: var(--panel);
+            border-radius: 28px;
+        }
+
+        .gift-icon img {
+            display: block;
+            max-width: 100%;
+            max-height: 340px;
+            height: auto;
+        }
+
+        /* ---------- Features ---------- */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            padding: 0 0 96px;
+        }
+
+        .feature {
+            padding-top: 20px;
+            border-top: 2px solid var(--ink);
+        }
+
+        .feature h3 {
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-weight: 700;
+            line-height: 1.25;
+            letter-spacing: -0.015em;
+        }
+
+        .feature p {
+            margin-top: 8px;
+            color: var(--muted);
+        }
+
+        /* ---------- Mobile ---------- */
+        @media (max-width: 860px) {
+            .toolbar { padding: 0 14px; }
+
+            .hero {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                padding: 40px 0 56px;
+            }
+
+            .gift-icon {
+                min-height: 0;
+                padding: 32px 24px;
+                border-radius: 22px;
+            }
+
+            .gift-icon img { max-height: 260px; }
+
+            .features {
+                grid-template-columns: 1fr;
+                gap: 28px;
+                padding-bottom: 64px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-actions .btn-primary,
+            .hero-actions .btn-secondary { flex: 1; }
+            .toolbar-buttons .btn-secondary { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header class="toolbar">
+        <a href="https://app.giftster.app/" class="toolbar-logo">
+            <img src="https://app.giftster.app/static/favicon.png" alt="">
+            Giftster
+        </a>
+        <nav class="toolbar-buttons">
+            <a href="https://app.giftster.app/login" class="btn-secondary">Login</a>
+            <a href="https://app.giftster.app/register" class="btn-primary">Register</a>
+        </nav>
+    </header>
+
+    <main class="page">
+        <section class="hero">
+            <div>
+                <h1>The holidays, handled.</h1>
+                <p class="hero-sub">Wish lists, gift claiming, and Secret Santa, minus the group-chat chaos.</p>
+                <div class="hero-actions">
+                    <a href="https://app.giftster.app/register" class="btn-primary btn-large">Start your list</a>
+                    <a href="https://app.giftster.app/login" class="btn-secondary btn-large">Login</a>
+                </div>
+            </div>
+            <div class="gift-icon">
+                <img src="https://app.giftster.app/static/one-pres.png" alt="A mint green present with a purple ribbon">
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="feature">
+                <h3>Get exactly what you want.</h3>
+                <p>Create your own wish list and share it with friends and family.</p>
+            </div>
+            <div class="feature">
+                <h3>Know what’s already taken.</h3>
+                <p>Claim gifts for others and keep track of what you’ve picked.</p>
+            </div>
+            <div class="feature">
+                <h3>Secret Santa, sorted.</h3>
+                <p>Run Secret Santa and gift exchanges with the click of a button.</p>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

@@ -20,6 +20,8 @@
     --teal: #087a77;
     --teal-dark: #05605e;
     --teal-tint: #e0f3f1;
+    --teal-wash: #d7efec;   /* gift exchange banner; also the landing page panel */
+    --teal-wash-line: #b3dbd6;
 
     --sun: #ffcf3f;
     --sun-tint: #fff6d6;
@@ -381,7 +383,7 @@ button:disabled {
 .badge-success   { background: var(--teal);      color: #fff; }
 .badge-claimed   { background: var(--sun-tint);  color: var(--sun-ink); }
 .badge-available { background: var(--mint-tint); color: var(--mint-ink); }
-.badge-exchange  { background: var(--sun);       color: var(--ink); }
+.badge-exchange  { background: var(--teal-wash); color: var(--teal-dark); box-shadow: inset 0 0 0 1px var(--teal-wash-line); }
 
 /* ---------- Groups dashboard ---------- */
 
@@ -505,9 +507,10 @@ button:disabled {
     font-weight: 600;
 }
 
-/* The one loud moment on the page */
+/* The one standout moment on the page */
 .gift-exchange-banner {
-    background: var(--sun);
+    background: var(--teal-wash);
+    border: 1px solid var(--teal-wash-line);
     color: var(--ink);
     padding: 28px 32px;
     border-radius: 16px;
@@ -542,7 +545,7 @@ button:disabled {
     max-width: 600px;
     margin: 20px 0 0;
     border: 0;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.75);
 }
 
 .gift-exchange-setup {
