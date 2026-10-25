@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% from "_macros.html" import item_fields, item_details, likes_box %}
 
-{% block title %}My Wishlist{% endblock %}
+{% block title %}My wishlist{% endblock %}
 
 {% block content %}
 <div class="general-card">
     <div class="header">
         <div>
-            <h1>My Wishlist</h1>
+            <h1>My wishlist</h1>
             <p>🔒 Only you can see this list. Copy items into a group when you want to share them.</p>
         </div>
     </div>
@@ -99,16 +99,16 @@
             <p class="text-muted">Join or create a group to share items from this list.</p>
         {% endif %}
     {% else %}
-        <p>Your wishlist is empty. Add things you'd like here, then copy them into any of your groups.</p>
+        <p class="empty-state">Your wishlist is empty. Add things you’d like here, then copy them into any of your groups.</p>
     {% endif %}
 
     <div class="add-gift-section">
         <button onclick="toggleGiftForm()" class="btn-add-gift" id="toggleButton">
-            Add to Wishlist
+            Add to wishlist
         </button>
 
         <div class="add-gift-form" id="giftForm" hidden>
-            <h3>Add to Your Wishlist</h3>
+            <h3>Add to your wishlist</h3>
             <form method="POST" action="{{ url_for('wishlist') }}">
                 {{ item_fields(id_prefix='new-') }}
                 <button type="submit" class="btn-primary">Add</button>

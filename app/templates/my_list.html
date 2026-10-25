@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% from "_macros.html" import item_fields, item_details, likes_box, thread %}
 
-{% block title %}My Gifts{% endblock %}
+{% block title %}My list{% endblock %}
 
 {% block content %}
 <div class="general-card">
     <div class="header">
         <h1>My list for {{ group.name }}</h1>
         <div class="header-actions">
-            <a href="{{ url_for('group_detail', group_id=group.id) }}" class="btn-primary">Back to Group</a>
-            <a href="{{ url_for('dashboard') }}" class="btn-secondary">Back to Dashboard</a>
+            <a href="{{ url_for('group_detail', group_id=group.id) }}" class="btn-primary">Back to group</a>
+            <a href="{{ url_for('dashboard') }}" class="btn-secondary">Back to dashboard</a>
         </div>
     </div>
 
@@ -46,7 +46,7 @@
             {% endfor %}
         </ul>
     {% else %}
-        <p>You haven't added any gifts yet!</p>
+        <p class="empty-state">Nothing on your list yet. Add your first gift below.</p>
     {% endif %}
 
     <div class="add-gift-section">
@@ -79,14 +79,14 @@
         {% endif %}
 
         <button onclick="toggleGiftForm()" class="btn-add-gift" id="toggleButton">
-            Add Gift
+            Add gift
         </button>
 
         <div class="add-gift-form" id="giftForm" hidden>
-            <h3>Add a New Gift</h3>
+            <h3>Add a gift</h3>
             <form method="POST" action="{{ url_for('my_list', group_id=group.id) }}">
                 {{ item_fields(id_prefix='new-') }}
-                <button type="submit" class="btn-primary">Add Gift</button>
+                <button type="submit" class="btn-primary">Add gift</button>
                 <button type="button" onclick="toggleGiftForm()" class="btn-secondary">Cancel</button>
             </form>
         </div>

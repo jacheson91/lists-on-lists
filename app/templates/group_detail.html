@@ -4,8 +4,8 @@
 {# Shown to the claimer when the owner has changed an item since it was claimed #}
 {% macro edit_alert(gift) %}
 {% set labels = {'item_name': 'Name', 'description': 'Description', 'link': 'Link'} %}
-<div class="edit-alert">
-    <strong>✏️ Updated since you claimed it</strong>
+<div class="edit-alert" role="status">
+    <strong>Updated since you claimed it</strong>
     <ul>
         {% for change in gift.edit_changes %}
             <li>
@@ -28,57 +28,62 @@
 
 {% block content %}
 <div class="general-card">
-    <div class="header">
+
+    <header class="header">
         <div>
             <h1>{{ group.name }}</h1>
-            <p>{{ group.description }}</p>
-            <p><strong>Join Code:</strong> <code>{{ group.join_code }}</code></p>
-            <p><strong>Members:</strong> {{ member_count }}</p>
+            {% if group.description %}<p>{{ group.description }}</p>{% endif %}
+            <div class="group-meta">
+                <span><strong>Join code</strong> <code>{{ group.join_code }}</code></span>
+                <span><strong>{{ member_count }}</strong> {{ 'member' if member_count == 1 else 'members' }}</span>
+            </div>
         </div>
         <div class="group-actions">
-            <a href="{{ url_for('my_list', group_id=group.id) }}" class="btn-primary">Manage My List</a>
-            <a href="{{ url_for('dashboard') }}" class="btn-secondary">Back to Dashboard</a>
+            <a href="{{ url_for('my_list', group_id=group.id) }}" class="btn-primary">Manage my list</a>
+            <a href="{{ url_for('dashboard') }}" class="btn-secondary">Back to dashboard</a>
         </div>
-    </div>
+    </header>
 
     <!-- Gift Exchange Section -->
     {% if group.has_gift_exchange %}
-        <div class="gift-exchange-banner">
-            <h2>🎁 Gift Exchange Active!</h2>
+        <section class="gift-exchange-banner">
+            <h2>🎁 Your gift exchange is on</h2>
             {% if gift_exchange_assignment %}
-                <p class="exchange-assignment">You're buying for: <strong>{{ gift_exchange_assignment.first_name }} {{ gift_exchange_assignment.last_name }}</strong></p>
+                <p class="exchange-assignment">You’re buying for
+                    <strong>{{ gift_exchange_assignment.first_name }} {{ gift_exchange_assignment.last_name }}</strong>
+                </p>
                 {{ likes_box(gift_exchange_assignment) }}
             {% endif %}
-        </div>
+        </section>
     {% elif is_creator %}
-        <div class="gift-exchange-setup">
-            <h3>Start a Gift Exchange</h3>
-            <p>Randomly assign each member one person to buy a gift for!</p>
+        <section class="gift-exchange-setup">
+            <h3>Start a gift exchange</h3>
+            <p>Each member is randomly matched with one person to buy a gift for.</p>
             <form method="POST" action="{{ url_for('start_gift_exchange', group_id=group.id) }}">
-                <button type="submit" class="btn-primary">Start Gift Exchange</button>
+                <button type="submit" class="btn-primary">Start gift exchange</button>
             </form>
-        </div>
+        </section>
     {% endif %}
 
-    <h2>Member Gift Lists</h2>
-    
+    <h2>Member gift lists</h2>
+
     {% if member_gifts|length == 0 %}
-        <p>No other members in this group yet.</p>
+        <p class="empty-state">No one else has joined yet. Share the join code to invite people.</p>
     {% else %}
         {% for member in member_gifts %}
-            <div class="member-section">
-                <h3 class="member-heading">{{ member.user.first_name }}'s List
+            <section class="member-section">
+                <h3 class="member-heading">{{ member.user.first_name }}’s list
                     {% if member.claimed_by_me > 0 %}
                         <span class="badge-success">{{ member.claimed_by_me }} claimed by you</span>
                     {% endif %}
                     {% if gift_exchange_assignment and gift_exchange_assignment.id == member.user.id %}
-                        <span class="badge-exchange">Your Gift Exchange Match! 🎁</span>
+                        <span class="badge-exchange">Your gift exchange match 🎁</span>
                     {% endif %}
                 </h3>
                 {{ likes_box(member.user) }}
 
                 {% if member.gifts|length == 0 %}
-                    <p class="text-muted">No gifts added yet</p>
+                    <p class="text-muted">Nothing on this list yet.</p>
                 {% else %}
                     <ul class="item-list">
                         {% for gift in member.gifts %}
@@ -110,7 +115,7 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
-            </div>
+            </section>
         {% endfor %}
     {% endif %}
 </div>

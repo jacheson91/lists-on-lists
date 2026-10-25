@@ -1,263 +1,455 @@
-/* General Styles */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
+/* ==========================================================================
+   Gift lists: stylesheet
+   Direction: a bright, airy page; white surfaces with fine borders instead of
+   heavy frames and shadows; teal for action, sunshine yellow reserved for the
+   moments worth celebrating (the gift exchange). Class names are unchanged.
+   ========================================================================== */
+
+/* Fonts (Figtree + Bricolage Grotesque) are loaded by a <link> in base.html */
+
+:root {
+    --bg: #f3f8f7;
+    --surface: #ffffff;
+    --line: #dde8e6;
+    --line-strong: #c4d5d2;
+
+    --ink: #172625;
+    --muted: #566866;
+    --faint: #62716f;
+
+    --teal: #087a77;
+    --teal-dark: #05605e;
+    --teal-tint: #e0f3f1;
+
+    --sun: #ffcf3f;
+    --sun-tint: #fff6d6;
+    --sun-ink: #5c4300;
+
+    --coral: #c93a35;
+    --coral-tint: #fdebea;
+
+    --mint-tint: #e4f5e9;
+    --mint-ink: #1d6a38;
+
+    --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-display: "Bricolage Grotesque", "Figtree", system-ui, sans-serif;
+
+    --radius: 12px;
+    --radius-sm: 8px;
+    --toolbar-h: 64px;
+}
 
 * {
     box-sizing: border-box;
 }
 
 body {
-    font-family: 'Nunito', sans-serif;
-    background-color: #d9d9d9;
-    color: #333;
+    font-family: var(--font-body);
+    font-size: 16px;
+    background-color: var(--bg);
+    color: var(--ink);
     margin: 0;
     padding: 0;
     line-height: 1.6;
 }
 
+h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+}
+
 a {
+    color: var(--teal);
     text-decoration: none;
-    color: #007b5e;
 }
 
 a:hover {
-    color: #005a3c;
+    color: var(--teal-dark);
+    text-decoration: underline;
 }
 
-/* Alerts */
-.alert {
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 4px;
+:focus-visible {
+    outline: 3px solid var(--teal);
+    outline-offset: 2px;
 }
-.alert-success { background-color: #d4edda; color: #155724; }
-.alert-danger { background-color: #f8d7da; color: #721c24; }
-.alert-info { background-color: #d1ecf1; color: #0c5460; }
 
-/* Toolbar Styles */
+/* ---------- Toolbar ---------- */
+
 .toolbar {
-    background: #00b0b0;
-    color: white;
-    padding: 15px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    padding: 0 24px;
+    min-height: var(--toolbar-h);
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
     flex-wrap: wrap;
+    gap: 8px;
 }
 
 .toolbar a.toolbar-brand {
+    font-family: var(--font-display);
     font-size: 22px;
     font-weight: 700;
-    color: white;
-    text-decoration: none;
-    letter-spacing: 0.5px;
+    letter-spacing: -0.02em;
+    color: var(--teal-dark);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     padding: 0;
     background: none;
 }
 
 .toolbar a.toolbar-brand:hover {
     background: none;
+    text-decoration: none;
 }
 
 .toolbar-brand img {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
 }
 
 .toolbar-nav {
     display: flex;
-    gap: 8px;
+    gap: 4px;
     align-items: center;
     flex-wrap: wrap;
 }
 
 .toolbar a {
-    color: white;
-    text-decoration: none;
-    padding: 10px 18px;
-    border-radius: 6px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.1);
-    font-size: 16px;
-    white-space: nowrap;
-}
-
-.toolbar a:hover {
-    background: rgba(255, 255, 255, 0.25);
-    transform: translateY(-2px);
-    text-decoration: none;
-}
-
-.toolbar a.active {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.toolbar .logout-btn {
-    background: #ff5e5a;
-    padding: 10px 18px;  /* Increased padding */
-    border-radius: 6px;
+    color: var(--ink);
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
     font-weight: 600;
+    font-size: 15px;
+    white-space: nowrap;
+    transition: background-color 0.15s, color 0.15s;
 }
 
-.toolbar .logout-btn:hover {
-    background: #ff4743;
-    transform: translateY(-2px);
+.toolbar a:hover,
+.toolbar a.active {
+    background: var(--teal-tint);
+    color: var(--teal-dark);
+    text-decoration: none;
 }
+
+.toolbar a.logout-btn {
+    color: var(--coral);
+    margin-left: 8px;
+}
+
+.toolbar a.logout-btn:hover {
+    background: var(--coral-tint);
+    color: var(--coral);
+}
+
+/* ---------- Page layout ---------- */
 
 .content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-image: url("/static/oneslice-gray.png");
-  background-size: 648px 450px;
-  background-position: center;
-  background-repeat: repeat;
-  padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - var(--toolbar-h));
+    padding: 32px 20px 64px;
 }
 
-.general-card {
-  background: #f1fbfa;
-  padding: 20px;
-  border: 8px solid #00b0b0;
-  border-radius: 8px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  margin-top: 20px;
-  align-self: start;
-  width: 100%;
-  max-width: 1200px;
-  min-height: auto;
-  /* No overflow setting here: it was for the old tables, and it would stop sticky elements
-     like the wishlist copy bar from sticking to the screen */
+/* The big bordered frame is gone: content sits directly on the page */
+.general-card,
+.dashboard-container {
+    width: 100%;
+    max-width: 960px;
+    align-self: start;
+    background: transparent;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    margin-top: 0;
+    /* No overflow setting here: it would stop the sticky copy bar from sticking */
 }
 
 .general-card h1 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  text-align: center;
-  color: #333;
-  font-size: 24px;
+    margin: 0 0 8px;
+    text-align: left;
+    font-size: 32px;
 }
 
-/* Dashboard Styles */
-.dashboard-container {
-    width: 100%;
-    max-width: 1200px;
-    padding: 20px;
-    background: #f1fbfa;
-    border: 8px solid #00b0b0;
-    border-radius: 8px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-    align-self: start;
-    min-height: auto;
+.general-card h2 {
+    font-size: 22px;
+    margin: 40px 0 16px;
 }
 
 .header {
     display: flex;
     justify-content: space-between;
-    align-items: start;
+    align-items: flex-start;
     flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 20px;
+    gap: 16px;
+    margin-bottom: 32px;
 }
 
 .header h1 {
-    margin-top: 0px;
-    margin-bottom: 10px;
-    font-size: 24px;
+    margin: 0 0 6px;
+    font-size: 32px;
 }
 
 .header p {
-    margin: 0px;
-    font-size: 16px;
+    margin: 0 0 4px;
+    color: var(--muted);
+}
+
+.header p strong {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.header code,
+.group-info code {
+    background: var(--teal-tint);
+    color: var(--teal-dark);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.header-actions,
+.group-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 .header-actions {
-    display: flex;
-    gap: 10px;
     align-self: flex-start;
-    flex-wrap: wrap;
 }
+
+/* ---------- Buttons ---------- */
+
+button {
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.4;
+    background-color: var(--teal);
+    color: #fff;
+    border: 1px solid transparent;
+    padding: 10px 18px;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+button:hover {
+    background-color: var(--teal-dark);
+}
+
+button:disabled {
+    background-color: #d5dedd;
+    color: #8a9896;
+    cursor: not-allowed;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-view,
+.btn-list,
+.btn-add-gift,
+.btn-delete-gift {
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.btn-primary,
+.btn-view,
+.btn-add-gift {
+    background: var(--teal);
+    color: #fff;
+}
+
+.btn-primary:hover,
+.btn-view:hover,
+.btn-add-gift:hover {
+    background: var(--teal-dark);
+    color: #fff;
+    text-decoration: none;
+}
+
+.btn-secondary,
+.btn-list {
+    background: var(--surface);
+    color: var(--ink);
+    border-color: var(--line-strong);
+}
+
+.btn-secondary:hover,
+.btn-list:hover {
+    background: var(--teal-tint);
+    border-color: var(--teal);
+    color: var(--teal-dark);
+    text-decoration: none;
+}
+
+.btn-delete-gift {
+    background: var(--surface);
+    color: var(--coral);
+    border-color: var(--coral);
+}
+
+.btn-delete-gift:hover {
+    background: var(--coral-tint);
+}
+
+.btn-view,
+.btn-list {
+    flex: 1;
+    min-width: 120px;
+}
+
+.btn-small {
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.btn-claim,
+.btn-edit,
+.btn-send {
+    background: var(--teal);
+    color: #fff;
+}
+
+.btn-unclaim {
+    background: var(--surface);
+    color: var(--coral);
+    border-color: var(--coral);
+}
+
+.btn-unclaim:hover {
+    background: var(--coral-tint);
+}
+
+.btn-dismiss {
+    background: var(--surface);
+    color: var(--sun-ink);
+    border-color: #d8b84a;
+}
+
+.btn-dismiss:hover {
+    background: #fff;
+}
+
+.add-gift-section {
+    margin-top: 32px;
+}
+
+/* ---------- Badges ---------- */
+
+.badge-success,
+.badge-claimed,
+.badge-available,
+.badge-exchange {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1.6;
+    white-space: nowrap;
+}
+
+.badge-success   { background: var(--teal);      color: #fff; }
+.badge-claimed   { background: var(--sun-tint);  color: var(--sun-ink); }
+.badge-available { background: var(--mint-tint); color: var(--mint-ink); }
+.badge-exchange  { background: var(--sun);       color: var(--ink); }
+
+/* ---------- Groups dashboard ---------- */
 
 .groups-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+    gap: 16px;
 }
 
 .group-card {
-    background: white;
-    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
     padding: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: border-color 0.15s;
 }
 
 .group-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: var(--teal);
 }
 
 .group-card h3 {
-    margin-top: 0;
-    color: #333;
+    margin: 0 0 4px;
     font-size: 20px;
 }
 
 .group-description {
-    color: #666;
-    font-size: 14px;
-    margin-bottom: 20px;
+    color: var(--muted);
+    font-size: 15px;
+    margin: 0 0 16px;
 }
 
 .group-stats {
     display: flex;
-    gap: 20px;
-    margin: 20px 0;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    justify-content: space-around;
+    gap: 24px;
+    margin: 16px 0;
+    padding: 12px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    justify-content: flex-start;
 }
 
 .stat {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
 }
 
 .stat-number {
+    font-family: var(--font-display);
     font-size: 24px;
     font-weight: 700;
-    color: #60b886;
+    line-height: 1.2;
+    color: var(--teal);
 }
 
 .stat-number.needs-attention {
-    color: #ff5e5a;
+    color: var(--coral);
 }
 
 .stat-label {
-    font-size: 11px;
-    color: #666;
-    text-transform: uppercase;
+    font-size: 13px;
+    color: var(--muted);
 }
 
 .group-info {
-    margin: 15px 0;
-    padding: 10px;
-    background: #f0f0f0;
-    border-radius: 6px;
+    margin: 12px 0;
+    color: var(--muted);
     word-break: break-all;
 }
 
@@ -265,360 +457,162 @@ a:hover {
     margin: 0;
 }
 
-.group-info code {
-    background: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-weight: 600;
-    color: #16cbc9;
+.empty-state h2 {
+    margin: 0 0 6px;
+    font-size: 20px;
+    color: var(--ink);
 }
 
-.group-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+.empty-state p {
+    margin: 0;
 }
 
-.btn-view, .btn-list {
-    flex: 1;
-    min-width: 120px;
-    text-align: center;
-    padding: 10px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s;
-}
-
-.btn-view {
-    background: #60b886;
-    color: white;
-}
-
-.btn-view:hover {
-    background: #4da573;
-}
-
-.btn-list {
-    background: #16cbc9;
-    color: white;
-}
-
-.btn-list:hover {
-    background: #13b3b1;
+.dashboard-container .header {
+    align-items: center;
 }
 
 .empty-state {
     text-align: center;
-    padding: 40px 20px;
-    color: #666;
+    padding: 48px 20px;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius);
 }
 
-/* Group Detail Styles */
+/* ---------- Group detail ---------- */
+
 .group-header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 30px;
+    margin-bottom: 32px;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 16px;
+}
+
+.group-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 20px;
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 15px;
+}
+
+.group-meta strong {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+/* The one loud moment on the page */
+.gift-exchange-banner {
+    background: var(--sun);
+    color: var(--ink);
+    padding: 28px 32px;
+    border-radius: 16px;
+    margin-bottom: 40px;
+}
+
+.gift-exchange-banner h2 {
+    margin: 0 0 4px;
+    font-size: 20px;
+}
+
+.exchange-assignment {
+    margin: 0;
+    font-size: 18px;
+}
+
+.exchange-assignment strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 36px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+}
+
+.exchange-hint {
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.gift-exchange-banner .likes-box {
+    max-width: 600px;
+    margin: 20px 0 0;
+    border: 0;
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.gift-exchange-setup {
+    background: var(--surface);
+    padding: 24px;
+    border-radius: var(--radius);
+    margin-bottom: 40px;
+    border: 1px dashed var(--teal);
+}
+
+.gift-exchange-setup h3 {
+    margin: 0 0 4px;
+    font-size: 20px;
+}
+
+.gift-exchange-setup p {
+    color: var(--muted);
+    margin: 0 0 16px;
 }
 
 .member-section {
     margin-bottom: 40px;
 }
 
-.badge-success {
-    background: #60b886;
-    color: white;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.badge-claimed {
-    background: #ffd136;
-    color: #333;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.badge-available {
-    background: #a3d6d2;
-    color: #333;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.btn-small {
-    padding: 6px 16px;
-    border-radius: 4px;
-    font-size: 13px;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-
-.btn-claim {
-    background: #60b886;
-    color: white;
-}
-
-.btn-claim:hover {
-    background: #4da573;
-}
-
-.btn-unclaim {
-    background: #ff5e5a;
-    color: white;
-}
-
-.btn-unclaim:hover {
-    background: #ff4743;
+.member-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    margin: 0 0 12px;
+    font-size: 22px;
 }
 
 .text-muted {
-    color: #999;
-    font-style: italic;
+    color: var(--faint);
+    font-style: normal;
 }
 
-/* Login and Registration */
-.auth-card {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 420px;
+.claimed {
+    color: var(--faint);
+    text-decoration: line-through;
 }
 
-.auth-card h2, .auth-card h1 {
-  margin-top: 0;
-  margin-bottom: 30px;
-  text-align: center;
-  color: #333;
-  font-size: 24px;
-}
+/* ---------- Gift items: one panel, rows divided by hairlines ---------- */
 
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  color: #555;
-  font-weight: 500;
-}
-
-/* Inputs stay at 16px+ so iPhones don't zoom in when they're focused */
-.form-group input, .form-group select {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 12px;
-  border: 2px solid #e1e1e1;
-  border-radius: 6px;
-  font-size: 16px;
-  transition: border-color 0.3s;
-  box-sizing: border-box;
-  font-family: Nunito, sans-serif;
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: #3ec3d1;
-}
-
-.add-gift-section {
-    margin-top: 30px;
-}
-
-.btn-add-gift {
-    padding: 12px 24px;
-    background: #60b886;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font: inherit;
-    cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
-}
-
-.btn-add-gift:hover {
-    background: #4da573;
-    transform: translateY(-2px);
-}
-
-.btn-delete-gift {
-    padding: 8px 16px;
-    background: #007b5e;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font: inherit;
-    cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
-}
-
-.add-gift-form {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-top: 15px;
-}
-
-.add-gift-form h3 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    color: #333;
-}
-
-.form-group textarea {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid #e1e1e1;
-    border-radius: 6px;
-    font-size: 16px;
-    font-family: inherit;
-    transition: border-color 0.3s;
-    box-sizing: border-box;
-    resize: vertical;
-}
-
-.form-group textarea:focus {
-    outline: none;
-    border-color: #667eea;
-}
-
-.btn-primary {
-  padding: 12px 20px;
-  background: #00a3a3;
-  color: white;
-  font-weight: 600;
-  border: none;
-  border-radius: 6px;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  display: inline-block;
-  text-align: center;
-  font: inherit;
-}
-
-.btn-primary:hover {
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-}
-
-.btn-secondary {
-  padding: 12px 20px;
-  background: #ffd136;
-  color: #333;
-  border: none;
-  border-radius: 6px;
-  font-family: inherit;
-  font-size: 16px;
-  font-weight: 600;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  display: inline-block;
-  text-align: center;
-  margin-left: 10px;
-}
-
-.btn-secondary:hover {
-  color: #333;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-}
-
-.auth-link {
-  text-align: center;
-  margin-top: 20px;
-  color: #666;
-  font-size: 14px;
-}
-
-.auth-link a {
-  color: #667eea;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.auth-link a:hover {
-  text-decoration: underline;
-}
-
-/* User Section */
-.user-section {
-    margin: 20px 0;
-    padding: 15px;
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
-
-.user-section h3 {
-    color: #8b0000;
-}
-
-.user-section p {
-    margin: 10px 0;
-}
-
-/* Buttons */
-button {
-    background-color: #007b5e;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    cursor: pointer;
-    border-radius: 6px;
-    line-height: 1.6;
-}
-
-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-}
-
-button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-/* Gift item cards (used instead of tables so lists work on phones) */
 .item-list {
     list-style: none;
-    margin: 15px 0;
+    margin: 12px 0;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
 }
 
 .item-card {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-    padding: 14px 16px;
+    padding: 16px 20px;
 }
 
-/* Details on the left, status and buttons on the right; extras (edit form, alerts) go below */
+.item-card + .item-card {
+    border-top: 1px solid var(--line);
+}
+
 .item-row {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 12px;
+    gap: 16px;
 }
 
 .item-body {
@@ -633,8 +627,8 @@ button:disabled {
 }
 
 .item-description {
-    margin: 4px 0 0;
-    color: #555;
+    margin: 2px 0 0;
+    color: var(--muted);
     white-space: pre-line;
     overflow-wrap: anywhere;
 }
@@ -656,22 +650,18 @@ button:disabled {
     margin: 0;
 }
 
-.btn-edit {
-    background: #00a3a3;
-    color: white;
-}
-
 .item-edit-form {
     margin-top: 4px;
 }
 
 /* Claimer's notice that the owner changed an item */
 .edit-alert {
-    margin-top: 12px;
-    padding: 12px 14px;
-    background: #fff8e1;
-    border-left: 4px solid #ffd136;
-    border-radius: 6px;
+    margin-top: 14px;
+    padding: 12px 16px;
+    background: var(--sun-tint);
+    border-left: 4px solid var(--sun);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    color: var(--sun-ink);
 }
 
 .edit-alert ul {
@@ -681,29 +671,25 @@ button:disabled {
 }
 
 .edit-alert s {
-    color: #888;
+    color: var(--faint);
 }
 
 .edit-field {
     font-weight: 600;
 }
 
-.btn-dismiss {
-    background: #555;
-    color: white;
-}
-
 .group-alert {
     display: block;
-    margin: -5px 0 15px;
+    margin: -4px 0 16px;
     padding: 8px 12px;
-    background: #fff8e1;
-    border-radius: 6px;
-    color: #6b5200;
+    background: var(--sun-tint);
+    border-radius: var(--radius-sm);
+    color: var(--sun-ink);
     font-weight: 600;
 }
 
-/* Private wishlist: tick items, then copy them into a group */
+/* ---------- Private wishlist: tick items, then copy into a group ---------- */
+
 .item-select {
     display: flex;
     align-items: flex-start;
@@ -718,22 +704,22 @@ button:disabled {
     height: 22px;
     margin: 3px 0 0;
     flex-shrink: 0;
-    accent-color: #00a3a3;
+    accent-color: var(--teal);
 }
 
 .copy-bar {
-    margin-top: 15px;
-    padding: 12px 14px;
-    background: white;
-    border: 2px solid #00a3a3;
-    border-radius: 10px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--teal);
+    border-radius: var(--radius);
+    box-shadow: 0 6px 24px rgba(23, 38, 37, 0.12);
 }
 
-/* Once something is ticked, keep the bar in view at the bottom of the screen while scrolling */
+/* Once something is ticked, keep the bar in view while scrolling */
 .general-card:has(input[form="copy-form"]:checked) .copy-bar {
     position: sticky;
-    bottom: 10px;
+    bottom: 12px;
 }
 
 .copy-bar label {
@@ -751,11 +737,11 @@ button:disabled {
     flex: 1;
     min-width: 0;
     padding: 10px;
-    border: 2px solid #e1e1e1;
-    border-radius: 6px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
     font-family: inherit;
     font-size: 16px;
-    background: white;
+    background: var(--surface);
 }
 
 .copy-bar-controls .btn-primary {
@@ -764,16 +750,16 @@ button:disabled {
 }
 
 .wishlist-import {
-    margin-bottom: 15px;
-    padding: 12px 14px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    margin-bottom: 16px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
 }
 
 .wishlist-import summary {
-    font-weight: 700;
-    color: #007b5e;
+    font-weight: 600;
+    color: var(--teal);
     cursor: pointer;
 }
 
@@ -788,30 +774,31 @@ button:disabled {
 
 .copied-to {
     margin: 6px 0 0;
-    color: #007b5e;
+    color: var(--teal-dark);
     font-size: 14px;
     font-weight: 600;
 }
 
 .pick-description {
     display: block;
-    color: #666;
+    color: var(--muted);
     font-size: 14px;
 }
 
 .hint {
-    color: #666;
+    color: var(--muted);
     font-size: 15px;
 }
 
-/* Likes & dislikes */
+/* ---------- Likes & dislikes ---------- */
+
 .likes-box {
-    margin: 10px 0;
-    padding: 10px 14px;
-    background: white;
-    border-radius: 10px;
-    border: 1px dashed #a3d6d2;
-    color: #333;
+    margin: 0 0 12px;
+    padding: 10px 16px;
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--line);
+    color: var(--ink);
     text-align: left;
 }
 
@@ -827,18 +814,12 @@ button:disabled {
     white-space: nowrap;
 }
 
-.gift-exchange-banner .likes-box {
-    max-width: 600px;
-    margin: 15px auto 0;
-    border: none;
-}
-
 .likes-section {
-    margin-bottom: 25px;
-    padding: 14px 16px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    margin-bottom: 24px;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
 }
 
 .likes-section-header {
@@ -848,27 +829,32 @@ button:disabled {
     gap: 10px;
 }
 
-.likes-section h2,
-.wishlist-heading {
+.likes-section h2 {
     margin: 0;
     font-size: 20px;
 }
 
-.likes-section .likes-box {
-    border-style: solid;
-    background: #f8fdfc;
+.wishlist-heading {
+    margin: 8px 0 0;
+    font-size: 20px;
 }
 
-/* Message threads under each item */
+.likes-section .likes-box {
+    background: var(--bg);
+    border-color: var(--line);
+}
+
+/* ---------- Message threads under each item ---------- */
+
 .thread {
     margin-top: 12px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--line);
     padding-top: 8px;
 }
 
 .thread summary {
     cursor: pointer;
-    color: #007b5e;
+    color: var(--teal);
     font-weight: 600;
     font-size: 15px;
     padding: 4px 0;
@@ -885,14 +871,14 @@ button:disabled {
 
 .message {
     padding: 8px 12px;
-    border-radius: 8px;
-    background: #f4f6f8;
+    border-radius: var(--radius-sm);
+    background: var(--bg);
 }
 
-/* Each kind gets its own colour so it's obvious who can see what */
+/* Each kind keeps its own colour so it's obvious who can see what */
 .message-comment {
     background: #fff4e5;
-    border-left: 3px solid #f0a040;
+    border-left: 3px solid #e59a3a;
 }
 
 .message-anonymous {
@@ -901,8 +887,8 @@ button:disabled {
 }
 
 .message-reply {
-    background: #e6f6f1;
-    border-left: 3px solid #60b886;
+    background: var(--mint-tint);
+    border-left: 3px solid #4aa86c;
 }
 
 .message-meta {
@@ -914,13 +900,13 @@ button:disabled {
 }
 
 .message-tag {
-    color: #666;
+    color: var(--muted);
     font-size: 13px;
 }
 
 .message-date {
     margin-left: auto;
-    color: #999;
+    color: var(--faint);
     font-size: 13px;
 }
 
@@ -937,31 +923,16 @@ button:disabled {
 
 button.message-delete {
     background: none;
-    color: #999;
+    color: var(--faint);
     padding: 0;
     font-size: 13px;
+    font-weight: 500;
     text-decoration: underline;
 }
 
 button.message-delete:hover {
-    transform: none;
-    box-shadow: none;
-    color: #c0392b;
-}
-
-.message-form textarea {
-    width: 100%;
-    padding: 10px;
-    border: 2px solid #e1e1e1;
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 16px;
-    resize: vertical;
-}
-
-.message-form textarea:focus {
-    outline: none;
-    border-color: #3ec3d1;
+    background: none;
+    color: var(--coral);
 }
 
 .message-form .hint {
@@ -989,12 +960,157 @@ button.message-delete:hover {
     height: 18px;
     margin: 2px 0 0;
     flex-shrink: 0;
-    accent-color: #00a3a3;
+    accent-color: var(--teal);
 }
 
-.btn-send {
-    background: #00a3a3;
-    color: white;
+/* ---------- Forms ---------- */
+
+.auth-card {
+    background: var(--surface);
+    padding: 32px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 420px;
+}
+
+.auth-card h1,
+.auth-card h2 {
+    margin: 0 0 24px;
+    text-align: center;
+    font-size: 26px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 15px;
+}
+
+/* Inputs stay at 16px so iPhones don't zoom in when they're focused */
+.form-group input,
+.form-group select,
+.form-group textarea,
+.message-form textarea {
+    display: block;
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 16px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-group textarea,
+.message-form textarea {
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus,
+.message-form textarea:focus {
+    outline: none;
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px var(--teal-tint);
+}
+
+/* Auth pages put .form-group on the <form> itself: stack its fields evenly */
+form.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+form.form-group label {
+    margin: 6px 0 -6px;
+}
+
+form.form-group small {
+    margin-top: -6px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.auth-card > p {
+    margin: 0 0 20px;
+    color: var(--muted);
+    text-align: center;
+}
+
+/* Narrow single-purpose pages (create / join group) */
+.general-card.narrow {
+    max-width: 520px;
+}
+
+.narrow > p {
+    color: var(--muted);
+    margin: 0 0 24px;
+}
+
+.code-input {
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+}
+
+/* Save / Cancel pairs inside forms */
+.btn-primary + .btn-secondary,
+.btn-secondary + .btn-primary {
+    margin-left: 8px;
+}
+
+.header-actions > *,
+.group-actions > * {
+    margin-left: 0 !important;
+}
+
+.add-gift-form {
+    background: var(--surface);
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    margin-top: 16px;
+}
+
+.add-gift-form h3 {
+    margin: 0 0 16px;
+}
+
+.auth-link {
+    text-align: center;
+    margin-top: 20px;
+    color: var(--muted);
+    font-size: 15px;
+}
+
+.auth-link a {
+    font-weight: 600;
+}
+
+.user-section {
+    margin: 20px 0;
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+
+.user-section h3 {
+    color: var(--ink);
+}
+
+.user-section p {
+    margin: 10px 0;
 }
 
 /* Author display rules like .item-row's flex would otherwise override the hidden attribute */
@@ -1002,74 +1118,42 @@ button.message-delete:hover {
     display: none !important;
 }
 
-.member-heading {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 0;
-}
+/* ---------- Footer & flash messages ---------- */
 
-/* Claimed Gifts */
-.claimed {
-    color: gray;
-    text-decoration: line-through;
-}
-
-/* Footer */
 .footer {
     text-align: center;
-    margin: 20px 0;
-    color: #555;
+    margin: 24px 0;
+    color: var(--muted);
+    font-size: 14px;
 }
 
-/* Flash Messages */
 .flash-container {
-    max-width: 1200px;
-    margin: 20px auto;
+    max-width: 960px;
+    margin: 20px auto 0;
     padding: 0 20px;
 }
 
 .alert {
-    padding: 15px 40px 15px 15px;
+    padding: 12px 44px 12px 16px;
     margin-bottom: 10px;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
     position: relative;
-    animation: slideIn 0.3s ease-out;
+    animation: slideIn 0.25s ease-out;
 }
 
 @keyframes slideIn {
-    from {
-        transform: translateY(-20px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+    from { transform: translateY(-8px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
 }
 
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.alert-info {
-    background-color: #d1ecf1;
-    color: #0c5460;
-    border: 1px solid #bee5eb;
-}
+.alert-success { background: var(--mint-tint);  color: var(--mint-ink); border-color: #b9e2c5; }
+.alert-danger  { background: var(--coral-tint); color: #8f2420;         border-color: #f3c1be; }
+.alert-info    { background: var(--teal-tint);  color: var(--teal-dark); border-color: #b5e0dc; }
 
 .alert-close {
     position: absolute;
-    right: 10px;
+    right: 8px;
     top: 50%;
     transform: translateY(-50%);
     background: none;
@@ -1077,7 +1161,7 @@ button.message-delete:hover {
     font-size: 24px;
     cursor: pointer;
     color: inherit;
-    opacity: 0.5;
+    opacity: 0.55;
     padding: 0;
     width: 30px;
     height: 30px;
@@ -1085,75 +1169,19 @@ button.message-delete:hover {
 }
 
 .alert-close:hover {
+    background: none;
     opacity: 1;
 }
 
-/* Gift Exchange Styles */
-.gift-exchange-banner {
-    background: #16cbc9;
-    color: white;
-    padding: 25px;
-    border-radius: 12px;
-    margin-bottom: 30px;
-    text-align: center;
-}
+/* ---------- Mobile ---------- */
 
-.gift-exchange-banner h2 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 28px;
-}
-
-.exchange-assignment {
-    font-size: 20px;
-    margin: 15px 0;
-}
-
-.exchange-assignment strong {
-    font-size: 24px;
-    text-decoration: underline;
-}
-
-.exchange-hint {
-    font-size: 14px;
-    opacity: 0.9;
-    margin-top: 10px;
-}
-
-.gift-exchange-setup {
-    background: #f8f9fa;
-    padding: 25px;
-    border-radius: 12px;
-    margin-bottom: 30px;
-    border: 2px dashed #60b886;
-}
-
-.gift-exchange-setup h3 {
-    margin-top: 0;
-    color: #333;
-}
-
-.gift-exchange-setup p {
-    color: #666;
-    margin-bottom: 15px;
-}
-
-.badge-exchange {
-    background: #ffd136;
-    color: #333;
-    padding: 6px 14px;
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 600;
-    margin-left: 10px;
-}
-
-
-/* Mobile Responsive Styles */
 @media (max-width: 768px) {
-    /* One compact toolbar row: icon-only brand, small nav buttons */
+    :root {
+        --toolbar-h: 56px;
+    }
+
     .toolbar {
-        padding: 8px 12px;
+        padding: 0 12px;
         flex-wrap: nowrap;
     }
 
@@ -1162,45 +1190,42 @@ button.message-delete:hover {
     }
 
     .toolbar-brand img {
-        width: 34px;
-        height: 34px;
+        width: 32px;
+        height: 32px;
     }
 
     .toolbar-nav {
         flex-wrap: nowrap;
-        gap: 6px;
+        gap: 2px;
     }
 
     .toolbar a {
-        padding: 7px 12px;
+        padding: 7px 10px;
         font-size: 15px;
     }
 
+    .toolbar a.logout-btn {
+        margin-left: 2px;
+    }
+
     .flash-container {
-        margin: 10px auto;
-        padding: 0 10px;
+        margin: 12px auto 0;
+        padding: 0 12px;
     }
 
     .content {
-        background-size: 200px 200px;
-        padding: 10px;
-    }
-
-    .general-card,
-    .dashboard-container {
-        padding: 15px;
-        border-width: 4px;
-        margin-top: 0;
+        padding: 20px 14px 48px;
     }
 
     .general-card h1,
     .header h1 {
-        font-size: 20px;
+        font-size: 26px;
     }
 
     .header {
         flex-direction: column;
         align-items: stretch;
+        margin-bottom: 24px;
     }
 
     /* Page-level buttons sit side by side instead of stacking full-width */
@@ -1213,7 +1238,6 @@ button.message-delete:hover {
     .header-actions > a,
     .header .group-actions > a {
         flex: 1;
-        margin: 0;
         padding: 10px 12px;
         white-space: normal;
     }
@@ -1223,21 +1247,11 @@ button.message-delete:hover {
     }
 
     .group-card {
-        padding: 15px;
-    }
-
-    .group-card h3 {
-        font-size: 18px;
-    }
-
-    .group-stats {
-        gap: 15px;
-        margin: 15px 0;
-        padding: 10px;
+        padding: 16px;
     }
 
     .stat-number {
-        font-size: 20px;
+        font-size: 22px;
     }
 
     .btn-add-gift {
@@ -1245,27 +1259,33 @@ button.message-delete:hover {
     }
 
     .auth-card {
-        padding: 20px;
+        padding: 24px 20px;
         max-width: 100%;
     }
 
-    .auth-card h1, .auth-card h2 {
-        font-size: 20px;
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
     }
 
-    .btn-primary, .btn-secondary {
-        width: 100%;
+    .group-actions .btn-primary,
+    .group-actions .btn-secondary {
+        width: auto;
+    }
+
+    .btn-primary + .btn-secondary,
+    .btn-secondary + .btn-primary {
         margin-left: 0;
         margin-top: 10px;
     }
 
     .add-gift-form {
-        padding: 15px;
+        padding: 16px;
     }
 
-    /* Item cards stack: details on top, status and buttons in a row underneath */
+    /* Item rows stack: details on top, status and buttons underneath */
     .item-card {
-        padding: 12px 14px;
+        padding: 14px 16px;
     }
 
     .item-row {
@@ -1274,9 +1294,7 @@ button.message-delete:hover {
 
     .item-actions {
         width: 100%;
-        flex-direction: row;
         justify-content: space-between;
-        align-items: center;
     }
 
     .item-actions .btn-small {
@@ -1284,15 +1302,18 @@ button.message-delete:hover {
         font-size: 15px;
     }
 
-    .gift-exchange-banner h2 {
-        font-size: 22px;
-    }
-
-    .exchange-assignment {
-        font-size: 18px;
+    .gift-exchange-banner {
+        padding: 22px 20px;
     }
 
     .exchange-assignment strong {
-        font-size: 20px;
+        font-size: 30px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
     }
 }

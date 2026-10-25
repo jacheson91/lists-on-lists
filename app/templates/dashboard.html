@@ -5,52 +5,52 @@
 {% block content %}
 <div class="dashboard-container">
     <div class="header">
-        <h1>My Gift Groups</h1>
+        <h1>My gift groups</h1>
         <div class="header-actions">
-            <a href="{{ url_for('create_group') }}" class="btn-primary">Create Group</a>
-            <a href="{{ url_for('join_group') }}" class="btn-secondary">Join Group</a>
+            <a href="{{ url_for('create_group') }}" class="btn-primary">Create group</a>
+            <a href="{{ url_for('join_group') }}" class="btn-secondary">Join group</a>
         </div>
     </div>
 
     {% if groups_data|length == 0 %}
         <div class="empty-state">
-            <h2>No groups yet!</h2>
-            <p>Create a new group or join an existing one to get started.</p>
+            <h2>No groups yet</h2>
+            <p>Create a group, or join one with a code from a friend.</p>
         </div>
     {% else %}
         <div class="groups-grid">
             {% for item in groups_data %}
                 <div class="group-card">
                     <h3>{{ item.group.name }}</h3>
-                    <p class="group-description">{{ item.group.description or "No description" }}</p>
+                    <p class="group-description">{{ item.group.description or "" }}</p>
                     
                     <div class="group-stats">
                         <div class="stat">
                             <span class="stat-number">{{ item.member_count }}</span>
-                            <span class="stat-label">Members</span>
+                            <span class="stat-label">members</span>
                         </div>
                         <div class="stat">
                             <span class="stat-number {% if item.needs_gift_count > 0 %}needs-attention{% endif %}">
                                 {{ item.needs_gift_count }}
                             </span>
-                            <span class="stat-label">Need Gifts</span>
+                            <span class="stat-label">need gifts</span>
                         </div>
                     </div>
 
                     {% if item.updated_claims_count %}
                         <a class="group-alert" href="{{ url_for('group_detail', group_id=item.group.id) }}">
-                            ✏️ {{ item.updated_claims_count }} gift{{ 's' if item.updated_claims_count > 1 }} you claimed
+                            {{ item.updated_claims_count }} gift{{ 's' if item.updated_claims_count > 1 }} you claimed
                             {{ 'have' if item.updated_claims_count > 1 else 'has' }} been updated
                         </a>
                     {% endif %}
 
                     <div class="group-info">
-                        <p><strong>Join Code:</strong> <code>{{ item.group.join_code }}</code></p>
+                        <p><strong>Join code</strong> <code>{{ item.group.join_code }}</code></p>
                     </div>
                     
                     <div class="group-actions">
-                        <a href="{{ url_for('group_detail', group_id=item.group.id) }}" class="btn-view">View Group</a>
-                        <a href="{{ url_for('my_list', group_id=item.group.id) }}" class="btn-list">My List</a>
+                        <a href="{{ url_for('group_detail', group_id=item.group.id) }}" class="btn-view">View group</a>
+                        <a href="{{ url_for('my_list', group_id=item.group.id) }}" class="btn-list">My list</a>
                     </div>
                 </div>
             {% endfor %}

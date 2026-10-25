@@ -6,15 +6,15 @@
 
 {% block content %}
 <div class="auth-card">
-    <h1>Register</h1>
+    <h1>Create your account</h1>
     {% include '_flashes.html' %}
     <form class="form-group" method="POST">
-        <input type="text" name="first_name" placeholder="First Name" autocomplete="given-name" required>
-        <input type="text" name="last_name" placeholder="Last Name" autocomplete="family-name" required>
+        <input type="text" name="first_name" placeholder="First name" autocomplete="given-name" required>
+        <input type="text" name="last_name" placeholder="Last name" autocomplete="family-name" required>
         <input type="email" name="email" placeholder="Email" autocomplete="email" required>
         <input type="password" name="password" placeholder="Password" autocomplete="new-password" required minlength="6">
-        <button type="submit" class="btn-primary">Register</button>
+        <button type="submit" class="btn-primary">Create account</button>
     </form>
-    <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a>.</p>
+    <p class="auth-link">Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
 </div>
 {% endblock %}
