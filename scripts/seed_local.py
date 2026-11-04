@@ -3,7 +3,7 @@
 Refuses to run unless FIRESTORE_EMULATOR_HOST is set, so it can never touch production.
 
 Every account's password is SEED_PASSWORD:
-    alice@example.com  Alice Smith  - created "Smith Family Christmas"
+    alice@example.com  Alice Smith  - created "Smith Family Christmas"; has archived last year's group
     ben@example.com    Ben Smith
     carol@example.com  Carol Jones  - created "Cousins Secret Santa" (exchange already drawn)
     dan@example.com    Dan Jones
@@ -105,7 +105,19 @@ def seed():
     draw = [('Carol', 'Dan'), ('Dan', 'Erin'), ('Erin', 'Alice'), ('Alice', 'Carol')]
     cousins.start_gift_exchange([(users[g].id, users[r].id) for g, r in draw])
 
-    print(f'Seeded {len(users)} users and 2 groups. Log in as alice@example.com (password in this file).')
+    # Last year's group, archived by Alice only: it's under "Archived groups" on her dashboard
+    # and view-only for her, while everyone else still sees it as a normal group
+    last_year = Group.create('Smith Family Christmas 2025', 'Last year at Grandma\'s', users['Ben'].id)
+    for name in ['Alice', 'Carol', 'Erin']:
+        last_year.add_member(users[name].id)
+    jumper = GiftList.create(last_year.id, users['Ben'].id, 'Christmas jumper', 'The uglier the better')
+    jumper.claim(users['Alice'].id)
+    Message.create(last_year.id, jumper.id, users['Carol'].id, 'comment', 'Alice, it was perfect')
+    GiftList.create(last_year.id, users['Alice'].id, 'Scarf', 'Got one in the end!')
+    GiftList.create(last_year.id, users['Erin'].id, 'Sketchbook')
+    last_year.archive_for(users['Alice'].id)
+
+    print(f'Seeded {len(users)} users and 3 groups. Log in as alice@example.com (password in this file).')
 
 
 if __name__ == '__main__':

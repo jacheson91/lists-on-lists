@@ -14,8 +14,13 @@
 
     {% if groups_data|length == 0 %}
         <div class="empty-state">
-            <h2>No groups yet</h2>
-            <p>Create a group, or join one with a code from a friend.</p>
+            {% if archived_groups %}
+                <h2>No active groups</h2>
+                <p>Everything’s archived. Create or join a group, or unarchive one below.</p>
+            {% else %}
+                <h2>No groups yet</h2>
+                <p>Create a group, or join one with a code from a friend.</p>
+            {% endif %}
         </div>
     {% else %}
         <div class="groups-grid">
@@ -55,6 +60,26 @@
                 </div>
             {% endfor %}
         </div>
+    {% endif %}
+
+    {% if archived_groups %}
+        <details class="archived-groups" {% if not groups_data %}open{% endif %}>
+            <summary>Archived groups ({{ archived_groups|length }})</summary>
+            <p class="hint">These are archived just for you, and view-only until you unarchive them.</p>
+            <ul class="archived-list">
+                {% for group in archived_groups %}
+                    <li class="archived-row">
+                        <div class="archived-info">
+                            <a href="{{ url_for('group_detail', group_id=group.id) }}" class="archived-name">{{ group.name }}</a>
+                            <span class="archived-date">Archived {{ group.archived_at|full_date }}</span>
+                        </div>
+                        <form method="POST" action="{{ url_for('unarchive_group', group_id=group.id) }}">
+                            <button type="submit" class="btn-unarchive">Unarchive</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        </details>
     {% endif %}
 </div>
 {% endblock %}

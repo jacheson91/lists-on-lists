@@ -51,8 +51,10 @@
 
 {# An item's message thread. The messages passed in must already be filtered with
    Message.visible_to for this viewer; this macro only decides how to label them.
-   On the owner's own list (owner_view) only signed replies can be posted. #}
-{% macro thread(gift, messages, viewer_id, owner_name, names={}, owner_view=False, open=False) %}
+   On the owner's own list (owner_view) only signed replies can be posted.
+   read_only (a group the viewer has archived) shows the messages without any forms. #}
+{% macro thread(gift, messages, viewer_id, owner_name, names={}, owner_view=False, open=False, read_only=False) %}
+{% if messages or not read_only %}
 <details class="thread" {% if open %}open{% endif %}>
     <summary>
         💬
@@ -82,7 +84,7 @@
                         <span class="message-date">{{ message.created_at|short_date }}</span>
                     </div>
                     <p class="message-text">{{ message.text }}</p>
-                    {% if message.author_id == viewer_id %}
+                    {% if message.author_id == viewer_id and not read_only %}
                         <form method="POST" onsubmit="return confirm('Delete this message?')"
                               action="{{ url_for('delete_message', group_id=gift.group_id, message_id=message.id) }}">
                             <button type="submit" class="message-delete">Delete</button>
@@ -92,6 +94,7 @@
             {% endfor %}
         </ul>
     {% endif %}
+    {% if not read_only %}
     <form class="message-form" method="POST" action="{{ url_for('post_message', group_id=gift.group_id, gift_id=gift.id) }}">
         <textarea name="text" rows="2" maxlength="1000" required aria-label="Message"
                   placeholder="{{ 'Answer a question or add a note…' if owner_view else 'Write a message…' }}"></textarea>
@@ -111,5 +114,20 @@
         {% endif %}
         <button type="submit" class="btn-small btn-send">{{ 'Reply' if owner_view else 'Send' }}</button>
     </form>
+    {% endif %}
 </details>
+{% endif %}
+{% endmacro %}
+
+{# Shown at the top of a group's pages when the viewer has archived it #}
+{% macro archived_banner(group, archived_at) %}
+<section class="archived-banner" role="status">
+    <div>
+        <strong>You archived this group on {{ archived_at|full_date }}</strong>
+        <p>It’s view-only for you. Everyone else can still use it as normal.</p>
+    </div>
+    <form method="POST" action="{{ url_for('unarchive_group', group_id=group.id) }}">
+        <button type="submit" class="btn-unarchive">Unarchive</button>
+    </form>
+</section>
 {% endmacro %}

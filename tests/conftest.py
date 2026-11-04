@@ -11,6 +11,9 @@ os.environ['GOOGLE_CLOUD_PROJECT'] = 'demo-giftster-test'
 from app import app as flask_app  # noqa: E402
 from app.models import User, Group  # noqa: E402
 
+# Let server errors raise in tests instead of quietly becoming 500 pages
+flask_app.config['TESTING'] = True
+
 EMULATOR = os.environ['FIRESTORE_EMULATOR_HOST']
 DATABASE = os.environ.get('FIRESTORE_DATABASE', 'giftster-db')
 PASSWORD = 'password123'
