@@ -1,9 +1,11 @@
 {% extends "base.html" %}
-{% from "_macros.html" import item_fields, item_details, likes_box, thread %}
+{% from "_macros.html" import item_fields, item_details, likes_box, thread, archived_banner %}
 
 {% block title %}My list{% endblock %}
 
 {% block content %}
+{# Archiving is per person: a group you've archived is view-only for you alone #}
+{% set view_only = archived_at is not none %}
 <div class="general-card">
     <div class="header">
         <h1>My list for {{ group.name }}</h1>
@@ -12,6 +14,10 @@
             <a href="{{ url_for('dashboard') }}" class="btn-secondary">Back to dashboard</a>
         </div>
     </div>
+
+    {% if view_only %}
+        {{ archived_banner(group, archived_at) }}
+    {% endif %}
 
     {% if current_user.likes or current_user.dislikes %}
         <p class="hint">The group also sees your likes &amp; dislikes (<a href="{{ url_for('wishlist', _anchor='likes') }}">edit</a>):</p>
@@ -26,29 +32,36 @@
                 <li class="item-card" id="item-{{ gift.id }}">
                     <div class="item-row" id="view-{{ gift.id }}">
                         {{ item_details(gift) }}
-                        <div class="item-actions">
-                            <button type="button" class="btn-small btn-edit" onclick="toggleEdit('{{ gift.id }}')">Edit</button>
-                            <form method="POST" action="{{ url_for('delete_item', group_id=group.id, gift_id=gift.id) }}"
-                                  onsubmit="return confirm('Delete this item from your list?')">
-                                <button type="submit" class="btn-small btn-delete-gift">Delete</button>
-                            </form>
-                        </div>
+                        {% if not view_only %}
+                            <div class="item-actions">
+                                <button type="button" class="btn-small btn-edit" onclick="toggleEdit('{{ gift.id }}')">Edit</button>
+                                <form method="POST" action="{{ url_for('delete_item', group_id=group.id, gift_id=gift.id) }}"
+                                      onsubmit="return confirm('Delete this item from your list?')">
+                                    <button type="submit" class="btn-small btn-delete-gift">Delete</button>
+                                </form>
+                            </div>
+                        {% endif %}
                     </div>
-                    <form class="item-edit-form" id="edit-{{ gift.id }}" method="POST" hidden
-                          action="{{ url_for('edit_item', group_id=group.id, gift_id=gift.id) }}">
-                        {{ item_fields(gift, 'edit-' ~ gift.id ~ '-') }}
-                        <button type="submit" class="btn-primary">Save</button>
-                        <button type="button" class="btn-secondary" onclick="this.form.reset(); toggleEdit('{{ gift.id }}')">Cancel</button>
-                    </form>
+                    {% if not view_only %}
+                        <form class="item-edit-form" id="edit-{{ gift.id }}" method="POST" hidden
+                              action="{{ url_for('edit_item', group_id=group.id, gift_id=gift.id) }}">
+                            {{ item_fields(gift, 'edit-' ~ gift.id ~ '-') }}
+                            <button type="submit" class="btn-primary">Save</button>
+                            <button type="button" class="btn-secondary" onclick="this.form.reset(); toggleEdit('{{ gift.id }}')">Cancel</button>
+                        </form>
+                    {% endif %}
                     {{ thread(gift, threads[gift.id], current_user.id, current_user.first_name,
-                              owner_view=True, open=(open_thread == gift.id)) }}
+                              owner_view=True, open=(open_thread == gift.id), read_only=view_only) }}
                 </li>
             {% endfor %}
         </ul>
+    {% elif view_only %}
+        <p class="empty-state">You didn’t add anything to your list in this group.</p>
     {% else %}
         <p class="empty-state">Nothing on your list yet. Add your first gift below.</p>
     {% endif %}
 
+    {% if not view_only %}
     <div class="add-gift-section">
         {% if wishlist_to_add %}
             <details class="wishlist-import">
@@ -91,5 +104,6 @@
             </form>
         </div>
     </div>
+    {% endif %}
 </div>
 {% endblock %}

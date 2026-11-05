@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% from "_macros.html" import item_details, likes_box, thread %}
+{% from "_macros.html" import item_details, likes_box, thread, archived_banner %}
 
 {# Shown to the claimer when the owner has changed an item since it was claimed #}
-{% macro edit_alert(gift) %}
+{% macro edit_alert(gift, read_only=False) %}
 {% set labels = {'item_name': 'Name', 'description': 'Description', 'link': 'Link'} %}
 <div class="edit-alert" role="status">
     <strong>Updated since you claimed it</strong>
@@ -18,15 +18,19 @@
             </li>
         {% endfor %}
     </ul>
+    {% if not read_only %}
     <form method="POST" action="{{ url_for('dismiss_edit_alert', group_id=gift.group_id, gift_id=gift.id) }}">
         <button type="submit" class="btn-small btn-dismiss">Got it</button>
     </form>
+    {% endif %}
 </div>
 {% endmacro %}
 
 {% block title %}{{ group.name }}{% endblock %}
 
 {% block content %}
+{# Archiving is per person: a group you've archived is view-only for you alone #}
+{% set view_only = archived_at is not none %}
 <div class="general-card">
 
     <header class="header">
@@ -39,10 +43,14 @@
             </div>
         </div>
         <div class="group-actions">
-            <a href="{{ url_for('my_list', group_id=group.id) }}" class="btn-primary">Manage my list</a>
+            <a href="{{ url_for('my_list', group_id=group.id) }}" class="btn-primary">{{ 'View my list' if view_only else 'Manage my list' }}</a>
             <a href="{{ url_for('dashboard') }}" class="btn-secondary">Back to dashboard</a>
         </div>
     </header>
+
+    {% if view_only %}
+        {{ archived_banner(group, archived_at) }}
+    {% endif %}
 
     <!-- Gift Exchange Section -->
     {% if group.has_gift_exchange %}
@@ -55,7 +63,7 @@
                 {{ likes_box(gift_exchange_assignment) }}
             {% endif %}
         </section>
-    {% elif is_creator %}
+    {% elif is_creator and not view_only %}
         <section class="gift-exchange-setup">
             <h3>Start a gift exchange</h3>
             <p>Each member is randomly matched with one person to buy a gift for.</p>
@@ -93,30 +101,45 @@
                                     <div class="item-actions">
                                         {% if gift.claimer_id == current_user.id %}
                                             <span class="badge-success">Claimed by you</span>
-                                            <form method="POST" action="{{ url_for('unclaim_item', group_id=group.id, gift_id=gift.id) }}">
-                                                <button type="submit" class="btn-small btn-unclaim">Unclaim</button>
-                                            </form>
+                                            {% if not view_only %}
+                                                <form method="POST" action="{{ url_for('unclaim_item', group_id=group.id, gift_id=gift.id) }}">
+                                                    <button type="submit" class="btn-small btn-unclaim">Unclaim</button>
+                                                </form>
+                                            {% endif %}
                                         {% elif gift.is_claimed %}
                                             <span class="badge-claimed">Claimed</span>
                                         {% else %}
                                             <span class="badge-available">Available</span>
-                                            <form method="POST" action="{{ url_for('claim_item', group_id=group.id, gift_id=gift.id) }}">
-                                                <button type="submit" class="btn-small btn-claim">Claim</button>
-                                            </form>
+                                            {% if not view_only %}
+                                                <form method="POST" action="{{ url_for('claim_item', group_id=group.id, gift_id=gift.id) }}">
+                                                    <button type="submit" class="btn-small btn-claim">Claim</button>
+                                                </form>
+                                            {% endif %}
                                         {% endif %}
                                     </div>
                                 </div>
                                 {% if gift.claimer_id == current_user.id and gift.edited_since_claim %}
-                                    {{ edit_alert(gift) }}
+                                    {{ edit_alert(gift, read_only=view_only) }}
                                 {% endif %}
                                 {{ thread(gift, threads[gift.id], current_user.id, member.user.first_name,
-                                          names=names, open=(open_thread == gift.id)) }}
+                                          names=names, open=(open_thread == gift.id), read_only=view_only) }}
                             </li>
                         {% endfor %}
                     </ul>
                 {% endif %}
             </section>
         {% endfor %}
+    {% endif %}
+
+    {% if not view_only %}
+        <section class="archive-group">
+            <h3>Done with this group?</h3>
+            <p>Archiving moves it to the bottom of your dashboard and makes it view-only for you.
+               It doesn’t change anything for anyone else, and you can unarchive it any time.</p>
+            <form method="POST" action="{{ url_for('archive_group', group_id=group.id) }}">
+                <button type="submit" class="btn-secondary">Archive this group</button>
+            </form>
+        </section>
     {% endif %}
 </div>
 {% endblock %}

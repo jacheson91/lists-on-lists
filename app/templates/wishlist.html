@@ -53,17 +53,21 @@
             {% for item in items %}
                 <li class="item-card" id="item-{{ item.id }}">
                     <div class="item-row" id="view-{{ item.id }}">
-                        {% if groups %}
+                        {% set details %}
+                            {% call item_details(item) %}
+                                {% if copied_to.get(item.id) %}
+                                    <p class="copied-to">✓ On your list for {{ copied_to[item.id]|join(', ') }}</p>
+                                {% endif %}
+                            {% endcall %}
+                        {% endset %}
+                        {# Ticking is only offered when there's a group (not archived) to copy into #}
+                        {% if copy_groups %}
                             <label class="item-select">
                                 <input type="checkbox" name="item_ids" value="{{ item.id }}" form="copy-form">
-                                {% call item_details(item) %}
-                                    {% if copied_to.get(item.id) %}
-                                        <p class="copied-to">✓ On your list for {{ copied_to[item.id]|join(', ') }}</p>
-                                    {% endif %}
-                                {% endcall %}
+                                {{ details }}
                             </label>
                         {% else %}
-                            {{ item_details(item) }}
+                            {{ details }}
                         {% endif %}
                         <div class="item-actions">
                             <button type="button" class="btn-small btn-edit" onclick="toggleEdit('{{ item.id }}')">Edit</button>
@@ -83,18 +87,20 @@
             {% endfor %}
         </ul>
 
-        {% if groups %}
+        {% if copy_groups %}
             <div class="copy-bar">
                 <label for="copy-group">Copy ticked items to</label>
                 <div class="copy-bar-controls">
                     <select id="copy-group" name="group_id" form="copy-form">
-                        {% for group in groups %}
+                        {% for group in copy_groups %}
                             <option value="{{ group.id }}">{{ group.name }}</option>
                         {% endfor %}
                     </select>
                     <button type="submit" form="copy-form" class="btn-primary">Copy</button>
                 </div>
             </div>
+        {% elif groups %}
+            <p class="text-muted">All your groups are archived. Unarchive one from your dashboard to copy items into it.</p>
         {% else %}
             <p class="text-muted">Join or create a group to share items from this list.</p>
         {% endif %}

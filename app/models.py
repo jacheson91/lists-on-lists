@@ -141,9 +141,34 @@ class Group:
     
     def is_member(self, user_id):
         """Check if user is a member"""
+        return self.get_membership(user_id) is not None
+
+    def get_membership(self, user_id):
+        """The user's member record ({'joined_at', 'archived_at'}), or None if they aren't a member"""
         doc = db.collection('groups').document(self.id).collection('members').document(user_id).get()
-        return doc.exists
-    
+        return doc.to_dict() if doc.exists else None
+
+    # Archiving is per member: it moves the group to that member's archived groups and makes it
+    # view-only for them, without changing anything for anyone else in the group.
+
+    def archive_for(self, user_id):
+        """Archive the group for one member (who must already be a member)"""
+        db.collection('groups').document(self.id).collection('members').document(user_id).update({
+            'archived_at': now()
+        })
+
+    def unarchive_for(self, user_id):
+        """Make the group active again for one member"""
+        db.collection('groups').document(self.id).collection('members').document(user_id).update({
+            'archived_at': None
+        })
+
+    @staticmethod
+    def is_archived_for(group_id, user_id):
+        """Whether this member has archived the group (False for non-members)"""
+        doc = db.collection('groups').document(group_id).collection('members').document(user_id).get()
+        return doc.exists and bool(doc.to_dict().get('archived_at'))
+
     def get_members(self):
         """Get all members of the group"""
         members_docs = db.collection('groups').document(self.id).collection('members').stream()
@@ -455,14 +480,17 @@ def merge_edit_changes(existing, updates):
 
 
 def get_user_groups(user_id):
-    """Get all groups a user is a member of"""
+    """Get all groups a user is a member of, archived or not. Each group's archived_at is when
+    this user archived it, or None if it's active for them."""
     # Query all groups where user is in members subcollection
     all_groups = db.collection('groups').stream()
     user_groups = []
-    
+
     for group_doc in all_groups:
         member_doc = group_doc.reference.collection('members').document(user_id).get()
         if member_doc.exists:
-            user_groups.append(Group(group_doc.id, group_doc.to_dict()))
-    
+            group = Group(group_doc.id, group_doc.to_dict())
+            group.archived_at = member_doc.to_dict().get('archived_at')
+            user_groups.append(group)
+
     return user_groups

@@ -59,7 +59,7 @@ Tests use their own emulator project and wipe it before each test, so they don't
 users/{uid}               first_name, last_name, email, password_hash, likes, dislikes
   private_items/{id}      item_name, description, link, created_at       (private wishlist, owner only)
 groups/{gid}              name, description, join_code, created_by, created_at, has_gift_exchange
-  members/{uid}           joined_at
+  members/{uid}           joined_at, archived_at                          (archived_at is per member)
   gift_lists/{id}         user_id, item_name, description, link, is_claimed, claimer_id, created_at,
                           edited_since_claim, edit_changes, source_private_id
   gift_exchanges/{id}     giver_id, receiver_id, created_at
@@ -76,3 +76,4 @@ groups/{gid}              name, description, join_code, created_by, created_at, 
 - `edited_since_claim` / `edit_changes` tell the claimer what changed after they claimed. They're cleared when the claimer dismisses the notice, or on claim or unclaim.
 - Copying from the private wishlist creates an independent `gift_lists` item. `source_private_id` only records where it came from, so it isn't offered for copying again.
 - Older documents may lack the newer fields; the models default them.
+- Archiving is per person. `members/{uid}.archived_at` moves the group to that member's "Archived groups" and makes it view-only for them only. Templates hide the controls, and every route that changes a group calls `view_only_redirect` first. Other members are unaffected. Unarchive from the dashboard or the banner, or by entering the join code again.
