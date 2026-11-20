@@ -17,3 +17,8 @@ spec:
             secretKeyRef:
               name: RESEND_API_KEY
               key: latest
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: SECRET_KEY
+              key: latest

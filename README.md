@@ -40,7 +40,7 @@ Tests use their own emulator project and wipe it before each test, so they don't
 
 ## Deploying
 
-[cloudbuild.yaml](cloudbuild.yaml) builds the image and deploys [cloudrun.yaml](cloudrun.yaml) to Cloud Run (project `list-app-475800`, region `us-central1`). Production uses the Firestore database `giftster-db` and reads `RESEND_API_KEY` from Secret Manager.
+[cloudbuild.yaml](cloudbuild.yaml) builds the image and deploys [cloudrun.yaml](cloudrun.yaml) to Cloud Run (project `list-app-475800`, region `us-central1`). Production uses the Firestore database `giftster-db` and reads `RESEND_API_KEY` and `SECRET_KEY` from Secret Manager. `SECRET_KEY` signs login cookies and password reset links. The app refuses to start without it unless it's pointed at the local emulator. Changing it logs everyone out and invalidates any reset links already sent.
 
 ## Code map
 
