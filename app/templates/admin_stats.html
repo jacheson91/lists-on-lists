@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Site stats{% endblock %}
+
+{# The only messages on this page come from the reset form, so show them next to it #}
+{% block flashes %}{% endblock %}
+
+{% block content %}
+<div class="general-card">
+    <div class="header">
+        <div>
+            <h1>Site stats</h1>
+            <p>Only admins can see this page. Numbers are live from the database.</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('dashboard') }}" class="btn-secondary">Back to dashboard</a>
+        </div>
+    </div>
+
+    <section class="stats-section">
+        <h2>Accounts</h2>
+        <div class="stats-grid">
+            <div class="stats-tile"><span class="stat-number">{{ stats.accounts }}</span><span class="stat-label">total</span></div>
+            <div class="stats-tile"><span class="stat-number">{{ stats.new_accounts_week }}</span><span class="stat-label">new in the last 7 days</span></div>
+            <div class="stats-tile"><span class="stat-number">{{ stats.new_accounts_month }}</span><span class="stat-label">new in the last 30 days</span></div>
+            <div class="stats-tile"><span class="stat-number">{{ stats.accounts_in_groups }}</span><span class="stat-label">in at least one group</span></div>
+            <div class="stats-tile"><span class="stat-number {% if stats.accounts_without_groups %}needs-attention{% endif %}">{{ stats.accounts_without_groups }}</span><span class="stat-label">not in any group</span></div>
+        </div>
+    </section>
+
+    <section class="stats-section">
+        <h2>Groups</h2>
+        <div class="stats-grid">
+            <div class="stats-tile"><span class="stat-number">{{ stats.groups }}</span><span class="stat-label">total</span></div>
+            <div class="stats-tile"><span class="stat-number">{{ stats.new_groups_week }}</span><span class="stat-label">new in the last 7 days</span></div>
+            <div class="stats-tile"><span class="stat-number">{{ stats.new_groups_month }}</span><span class="stat-label">new in the last 30 days</span></div>
+            <div class="stats-tile"><span class="stat-number">{{ stats.average_group_size }}</span><span class="stat-label">members per group, on average</span></div>
+            <div class="stats-tile"><span class="stat-number">{{ stats.groups_with_exchange }}</span><span class="stat-label">with a gift exchange</span></div>
+        </div>
+    </section>
+
+    <section class="stats-section">
+        <h2>Activity</h2>
+        <div class="stats-grid">
+            <div class="stats-tile"><span class="stat-number">{{ stats.gift_items }}</span><span class="stat-label">gift list items</span></div>
+            <div class="stats-tile"><span class="stat-number">{{ stats.wishlist_items }}</span><span class="stat-label">private wishlist items</span></div>
+            <div class="stats-tile"><span class="stat-number">{{ stats.messages }}</span><span class="stat-label">messages</span></div>
+        </div>
+    </section>
+
+    <section class="stats-section">
+        <h2>Week by week</h2>
+        {% set busiest = [stats.weekly|map(attribute=1)|max, stats.weekly|map(attribute=2)|max, 1]|max %}
+        <table class="weekly-table">
+            <thead>
+                <tr><th scope="col">Week of</th><th scope="col">New accounts</th><th scope="col">New groups</th></tr>
+            </thead>
+            <tbody>
+                {% for start, accounts, groups in stats.weekly|reverse %}
+                    <tr>
+                        <th scope="row">{{ start|full_date }}{% if loop.first %} (this week){% endif %}</th>
+                        <td><span class="bar" style="width: {{ (accounts / busiest * 100)|round }}%"></span>{{ accounts }}</td>
+                        <td><span class="bar bar-groups" style="width: {{ (groups / busiest * 100)|round }}%"></span>{{ groups }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="stats-section admin-tool" id="send-reset">
+        <h2>Help someone reset their password</h2>
+        <p class="hint">Sends them the usual reset email at the address on their account. The link works for an hour,
+           and you never see it. If it doesn’t arrive, check Resend to see whether it was delivered.</p>
+        {% include '_flashes.html' %}
+        <form method="POST" action="{{ url_for('admin_send_reset') }}" class="form-group admin-reset-form">
+            <label for="reset-email">Their email address</label>
+            <div class="admin-reset-controls">
+                <input type="email" id="reset-email" name="email" required autocomplete="off" placeholder="name@example.com">
+                <button type="submit" class="btn-primary">Send reset email</button>
+            </div>
+        </form>
+    </section>
+
+    <p class="hint">
+        For website traffic (requests, errors), see the
+        <a href="https://console.cloud.google.com/monitoring/dashboards?project=list-app-475800" target="_blank" rel="noopener">Giftster dashboard in Google Cloud Monitoring ↗</a>.
+    </p>
+</div>
+{% endblock %}

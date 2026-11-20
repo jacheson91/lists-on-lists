@@ -81,5 +81,9 @@
             </ul>
         </details>
     {% endif %}
+
+    {% if current_user.is_admin %}
+        <p class="admin-link"><a href="{{ url_for('admin_stats') }}">Site stats</a> (only admins see this)</p>
+    {% endif %}
 </div>
 {% endblock %}

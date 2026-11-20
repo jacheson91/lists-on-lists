@@ -1236,6 +1236,104 @@ form.form-group small {
     font-size: 14px;
 }
 
+/* ---------- Admin stats ---------- */
+
+.stats-section {
+    margin-bottom: 8px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+.stats-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+
+.weekly-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    font-size: 15px;
+}
+
+.weekly-table th,
+.weekly-table td {
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+}
+
+.weekly-table thead th {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.weekly-table tbody th {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.weekly-table td {
+    width: 40%;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Small bar behind each number, scaled to the busiest week */
+.weekly-table .bar {
+    display: inline-block;
+    max-width: calc(100% - 3ch);
+    height: 10px;
+    margin-right: 8px;
+    border-radius: 999px;
+    background: var(--teal);
+    vertical-align: middle;
+}
+
+.weekly-table .bar-groups {
+    background: var(--sun);
+}
+
+.admin-tool .hint {
+    margin: 0 0 12px;
+    max-width: 60ch;
+}
+
+.admin-reset-controls {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.admin-reset-controls input {
+    flex: 1;
+    min-width: 0;
+    margin-bottom: 0;
+}
+
+.admin-reset-controls .btn-primary {
+    flex-shrink: 0;
+    width: auto;
+}
+
+.admin-link {
+    margin-top: 40px;
+    color: var(--muted);
+    font-size: 15px;
+}
+
 /* Author display rules like .item-row's flex would otherwise override the hidden attribute */
 [hidden] {
     display: none !important;
@@ -1436,6 +1534,24 @@ form.form-group small {
 
     .archived-row {
         padding: 12px 16px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .admin-reset-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .admin-reset-controls .btn-primary {
+        width: 100%;
+    }
+
+    .weekly-table th,
+    .weekly-table td {
+        padding: 8px 10px;
     }
 
     .gift-exchange-banner {

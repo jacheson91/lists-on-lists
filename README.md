@@ -42,6 +42,11 @@ Tests use their own emulator project and wipe it before each test, so they don't
 
 [cloudbuild.yaml](cloudbuild.yaml) builds the image and deploys [cloudrun.yaml](cloudrun.yaml) to Cloud Run (project `list-app-475800`, region `us-central1`). Production uses the Firestore database `giftster-db` and reads `RESEND_API_KEY` and `SECRET_KEY` from Secret Manager. `SECRET_KEY` signs login cookies and password reset links. The app refuses to start without it unless it's pointed at the local emulator. Changing it logs everyone out and invalidates any reset links already sent.
 
+## Stats and monitoring
+
+- **`/admin/stats`** shows totals and week-by-week growth (accounts, groups, items, messages), with a link from the dashboard. Only admins can see it; everyone else gets a 404. To make someone an admin, open their document in `users` in the Firestore console and add a boolean field `is_admin` set to `true`. The page also has a **Send reset email** button that emails someone the normal password reset link at their own address, and writes a line to the Cloud Run logs saying which admin sent it.
+- **Traffic:** the **Giftster** dashboard in Cloud Monitoring charts requests by result, plus sign-ups, groups created and password reset requests per day. [monitoring/setup.sh](monitoring/setup.sh) creates or updates it from [monitoring/dashboard.json](monitoring/dashboard.json). Those three counters are built from request logs, so they only count from when they were created.
+
 ## Code map
 
 | Path | What's there |

@@ -3,7 +3,7 @@
 Refuses to run unless FIRESTORE_EMULATOR_HOST is set, so it can never touch production.
 
 Every account's password is SEED_PASSWORD:
-    alice@example.com  Alice Smith  - created "Smith Family Christmas"; has archived last year's group
+    alice@example.com  Alice Smith  - admin; created "Smith Family Christmas"; has archived last year's group
     ben@example.com    Ben Smith
     carol@example.com  Carol Jones  - created "Cousins Secret Santa" (exchange already drawn)
     dan@example.com    Dan Jones
@@ -36,6 +36,9 @@ def seed():
     for first, last in [('Alice', 'Smith'), ('Ben', 'Smith'), ('Carol', 'Jones'),
                         ('Dan', 'Jones'), ('Erin', 'Smith')]:
         users[first] = User.create(first, last, f'{first.lower()}@example.com', SEED_PASSWORD)
+
+    # Alice can see the admin stats page (/admin/stats)
+    db.collection('users').document(users['Alice'].id).update({'is_admin': True})
 
     # Dan is left blank to show how a member without likes/dislikes looks
     users['Alice'].update_likes('Earl Grey, mystery novels, anything green', 'Glitter')
