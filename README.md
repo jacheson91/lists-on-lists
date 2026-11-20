@@ -44,7 +44,7 @@ Tests use their own emulator project and wipe it before each test, so they don't
 
 ## Stats and monitoring
 
-- **`/admin/stats`** shows totals and week-by-week growth (accounts, groups, items, messages), with a link from the dashboard. Only admins can see it; everyone else gets a 404. To make someone an admin, open their document in `users` in the Firestore console and add a boolean field `is_admin` set to `true`.
+- **`/admin/stats`** shows totals and week-by-week growth (accounts, groups, items, messages), with a link from the dashboard. Only admins can see it; everyone else gets a 404. To make someone an admin, open their document in `users` in the Firestore console and add a boolean field `is_admin` set to `true`. The page also has a **Send reset email** button that emails someone the normal password reset link at their own address, and writes a line to the Cloud Run logs saying which admin sent it.
 - **Traffic:** the **Giftster** dashboard in Cloud Monitoring charts requests by result, plus sign-ups, groups created and password reset requests per day. [monitoring/setup.sh](monitoring/setup.sh) creates or updates it from [monitoring/dashboard.json](monitoring/dashboard.json). Those three counters are built from request logs, so they only count from when they were created.
 
 ## Code map

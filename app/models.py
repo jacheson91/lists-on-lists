@@ -40,7 +40,22 @@ class User(UserMixin):
         for user in users:
             return User(user.id, user.to_dict())
         return None
-    
+
+    @staticmethod
+    def find_by_email(email):
+        """Like get_by_email, but ignores capitals (emails are stored as people typed them).
+        Falls back to scanning every account's email, so it's for admin tools, not every request."""
+        if not email:
+            return None
+        user = User.get_by_email(email)
+        if user:
+            return user
+        for doc in db.collection('users').select(['email']).stream():
+            stored = (doc.to_dict() or {}).get('email') or ''
+            if stored.lower() == email.lower():
+                return User.get(doc.id)
+        return None
+
     @staticmethod
     def create(first_name, last_name, email, password):
         """Create a new user"""

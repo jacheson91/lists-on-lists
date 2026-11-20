@@ -73,15 +73,7 @@ def forgot_password():
         user = User.get_by_email(email)
         
         if user:
-            # Generate reset token
-            serializer = get_serializer()
-            token = serializer.dumps(email, salt='password-reset-salt')
-            
-            # Create reset URL
-            reset_url = url_for('reset_password', token=token, _external=True)
-            
-            # Send email (for now just prints to console)
-            send_reset_email(email, reset_url)
+            email_reset_link(user)
             
         # Always show success message (don't reveal if email exists)
         flash('If that email exists, a password reset link has been sent.', 'info')
@@ -660,3 +652,27 @@ def admin_stats():
     if not current_user.is_admin:
         abort(404)
     return render_template('admin_stats.html', stats=site_stats())
+
+@app.route('/admin/send-reset', methods=['POST'])
+@login_required
+def admin_send_reset():
+    """Admins can send someone the normal password reset email. The link goes to that person's
+    own inbox, so the admin never sees it."""
+    if not current_user.is_admin:
+        abort(404)
+    
+    email = request.form.get('email', '').strip()
+    user = User.find_by_email(email)
+    if user:
+        email_reset_link(user)
+        # An audit trail in the Cloud Run logs (ids only)
+        print(f'Admin {current_user.id} sent a password reset email to user {user.id}', flush=True)
+        flash(f'Sent a password reset email to {user.email}. The link works for an hour.', 'success')
+    else:
+        flash(f'No account uses {email}.', 'danger')
+    return redirect(url_for('admin_stats', _anchor='send-reset'))
+
+def email_reset_link(user):
+    """Email a user a password reset link for their account (valid for an hour)"""
+    token = get_serializer().dumps(user.email, salt='password-reset-salt')
+    send_reset_email(user.email, url_for('reset_password', token=token, _external=True))
