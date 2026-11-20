@@ -1,0 +1,81 @@
+{
+  "displayName": "Giftster",
+  "mosaicLayout": {
+    "columns": 12,
+    "tiles": [
+      {
+        "xPos": 0, "yPos": 0, "width": 12, "height": 4,
+        "widget": {
+          "title": "Website requests per hour, by result (2xx ok, 3xx redirect, 4xx/5xx errors)",
+          "xyChart": {
+            "dataSets": [{
+              "plotType": "STACKED_BAR",
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"run.googleapis.com/request_count\" resource.type=\"cloud_run_revision\" resource.label.\"service_name\"=\"lists-on-lists\"",
+                  "aggregation": {
+                    "alignmentPeriod": "3600s",
+                    "perSeriesAligner": "ALIGN_SUM",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": ["metric.label.\"response_code_class\""]
+                  }
+                }
+              }
+            }]
+          }
+        }
+      },
+      {
+        "xPos": 0, "yPos": 4, "width": 4, "height": 4,
+        "widget": {
+          "title": "Sign-ups per day",
+          "xyChart": {
+            "dataSets": [{
+              "plotType": "STACKED_BAR",
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"logging.googleapis.com/user/giftster_signups\" resource.type=\"cloud_run_revision\"",
+                  "aggregation": {"alignmentPeriod": "86400s", "perSeriesAligner": "ALIGN_SUM", "crossSeriesReducer": "REDUCE_SUM"}
+                }
+              }
+            }]
+          }
+        }
+      },
+      {
+        "xPos": 4, "yPos": 4, "width": 4, "height": 4,
+        "widget": {
+          "title": "Groups created per day",
+          "xyChart": {
+            "dataSets": [{
+              "plotType": "STACKED_BAR",
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"logging.googleapis.com/user/giftster_groups_created\" resource.type=\"cloud_run_revision\"",
+                  "aggregation": {"alignmentPeriod": "86400s", "perSeriesAligner": "ALIGN_SUM", "crossSeriesReducer": "REDUCE_SUM"}
+                }
+              }
+            }]
+          }
+        }
+      },
+      {
+        "xPos": 8, "yPos": 4, "width": 4, "height": 4,
+        "widget": {
+          "title": "Password reset requests per day",
+          "xyChart": {
+            "dataSets": [{
+              "plotType": "STACKED_BAR",
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"logging.googleapis.com/user/giftster_password_reset_requests\" resource.type=\"cloud_run_revision\"",
+                  "aggregation": {"alignmentPeriod": "86400s", "perSeriesAligner": "ALIGN_SUM", "crossSeriesReducer": "REDUCE_SUM"}
+                }
+              }
+            }]
+          }
+        }
+      }
+    ]
+  }
+}

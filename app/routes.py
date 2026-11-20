@@ -1,7 +1,7 @@
-from flask import render_template, redirect, url_for, request, flash
+from flask import abort, render_template, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from app import app, login_manager
-from app.models import User, Group, GiftList, PrivateItem, Message, get_user_groups
+from app.models import User, Group, GiftList, PrivateItem, Message, get_user_groups, site_stats
 from app.utils import send_reset_email, get_serializer
 import random
 
@@ -651,3 +651,12 @@ def full_date(value):
     if not hasattr(value, 'strftime'):
         return ''
     return f'{value.day} {value.strftime("%b %Y")}'
+
+@app.route('/admin/stats')
+@login_required
+def admin_stats():
+    """Site-wide totals for admins (users with is_admin set in Firestore). Everyone else gets a 404
+    so the page doesn't advertise itself."""
+    if not current_user.is_admin:
+        abort(404)
+    return render_template('admin_stats.html', stats=site_stats())

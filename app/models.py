@@ -1,7 +1,7 @@
 from google.cloud import firestore
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import os
 import secrets
 
@@ -22,6 +22,8 @@ class User(UserMixin):
             # Free text shown next to the user's name in all their groups
             self.likes = data.get('likes', '')
             self.dislikes = data.get('dislikes', '')
+            # Set by hand in the Firestore console; admins can see /admin/stats
+            self.is_admin = data.get('is_admin', False)
     
     @staticmethod
     def get(user_id):
@@ -494,3 +496,44 @@ def get_user_groups(user_id):
             user_groups.append(group)
 
     return user_groups
+
+def site_stats(weeks=8):
+    """Totals and recent growth for the admin stats page. Counts use aggregation queries, and
+    sign-up/creation dates come from Firestore's own document create times, since users have
+    no created_at field."""
+    def count(query):
+        return query.count().get()[0][0].value
+
+    today = now()
+    week_ago, month_ago = today - timedelta(days=7), today - timedelta(days=30)
+
+    user_times = [doc.create_time for doc in db.collection('users').select([]).stream()]
+    groups = list(db.collection('groups').select(['has_gift_exchange']).stream())
+    # Member documents are keyed by user id, so their ids give everyone who's in a group
+    members = list(db.collection_group('members').select([]).stream())
+    in_a_group = {doc.id for doc in members}
+
+    # Weekly buckets starting on Mondays, oldest first
+    this_monday = (today - timedelta(days=today.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+    starts = [this_monday - timedelta(weeks=n) for n in range(weeks - 1, -1, -1)]
+
+    def per_week(times):
+        return [sum(1 for t in times if start <= t < start + timedelta(weeks=1)) for start in starts]
+
+    group_times = [doc.create_time for doc in groups]
+    return {
+        'accounts': len(user_times),
+        'accounts_in_groups': len(in_a_group),
+        'accounts_without_groups': len(user_times) - len(in_a_group),
+        'new_accounts_week': sum(1 for t in user_times if t >= week_ago),
+        'new_accounts_month': sum(1 for t in user_times if t >= month_ago),
+        'groups': len(groups),
+        'new_groups_week': sum(1 for t in group_times if t >= week_ago),
+        'new_groups_month': sum(1 for t in group_times if t >= month_ago),
+        'groups_with_exchange': sum(1 for doc in groups if doc.get('has_gift_exchange')),
+        'average_group_size': round(len(members) / len(groups), 1) if groups else 0,
+        'gift_items': count(db.collection_group('gift_lists')),
+        'wishlist_items': count(db.collection_group('private_items')),
+        'messages': count(db.collection_group('messages')),
+        'weekly': list(zip(starts, per_week(user_times), per_week(group_times))),
+    }
